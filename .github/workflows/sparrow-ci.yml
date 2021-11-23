@@ -1,0 +1,24 @@
+name: Sparrow CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate_code: # job id
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        id: checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Fetch dependencies
+        run: bin/fetch-deps
+
+      - name: Build in Container
+        id: build
+        uses: ./.github/actions/build
+

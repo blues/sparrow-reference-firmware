@@ -1,0 +1,381 @@
+cmake_minimum_required(VERSION 3.20)
+project(sparrow_sensor)
+
+enable_language(C ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)  # required for inline asm
+
+set(EXECUTABLE ${PROJECT_NAME}.elf)
+
+set(SDK ${CMAKE_SOURCE_DIR}/sparrow-lora)
+set(NOTE_C ${CMAKE_SOURCE_DIR}/note-c)  # for now we clone to the root. Will change if we use a submodule or post-checkout hook in the SDK
+
+include_directories(${SDK}/Application)
+include_directories(${SDK}/Application/App)
+include_directories(${SDK}/Application/Core/Inc)
+include_directories(${SDK}/Application/Core/Radio)
+include_directories(${SDK}/Application/Sensor)
+include_directories(${SDK}/Application/Sensor/bme280)
+include_directories(${SDK}/Drivers/CMSIS/Core/Include)
+include_directories(${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include)
+include_directories(${SDK}/Drivers/CMSIS/DSP/Include)
+include_directories(${SDK}/Drivers/CMSIS/Include)
+include_directories(${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc)
+include_directories(${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy)
+include_directories(${SDK}/Middlewares/Third_Party/SubGHz_Phy)
+include_directories(${SDK}/Middlewares/Third_Party/SubGHz_Phy/Conf)
+include_directories(${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver)
+include_directories(${NOTE_C})
+include_directories(${SDK}/Utilities/lpm/tiny_lpm)
+include_directories(${SDK}/Utilities/misc)
+include_directories(${SDK}/Utilities/sequencer)
+include_directories(${SDK}/Utilities/timer)
+include_directories(${SDK}/Utilities/trace/adv_trace)
+# use target_include_directories()?
+
+add_executable(${EXECUTABLE}
+        ${SDK}/Application/App/app.c
+        ${SDK}/Application/App/app.h
+        ${SDK}/Application/App/appinit.c
+        ${SDK}/Application/App/atp.c
+        ${SDK}/Application/App/dfu.c
+        ${SDK}/Application/App/dfuload.c
+        ${SDK}/Application/App/flash.c
+        ${SDK}/Application/App/gateway.c
+        ${SDK}/Application/App/led.c
+        ${SDK}/Application/App/note.c
+        ${SDK}/Application/App/post.c
+        ${SDK}/Application/App/radioinit.c
+        ${SDK}/Application/App/sched.c
+        ${SDK}/Application/App/sensor.c
+        ${SDK}/Application/App/trace.c
+        ${SDK}/Application/App/util.c
+        ${SDK}/Application/Core/Inc/main.h
+        ${SDK}/Application/Core/Inc/stm32_lpm_if.h
+        ${SDK}/Application/Core/Inc/stm32wlxx_hal_conf.h
+        ${SDK}/Application/Core/Inc/stm32wlxx_it.h
+        ${SDK}/Application/Core/Inc/timer_if.h
+        ${SDK}/Application/Core/Inc/utilities_conf.h
+        ${SDK}/Application/Core/Inc/utilities_def.h
+        ${SDK}/Application/Core/Radio/mw_log_conf.h
+        ${SDK}/Application/Core/Radio/radio_board_if.c
+        ${SDK}/Application/Core/Radio/radio_conf.h
+        ${SDK}/Application/Core/Radio/timer.h
+        ${SDK}/Application/Core/Src/debug.c
+        ${SDK}/Application/Core/Src/main.c
+        ${SDK}/Application/Core/Src/stm32_lpm_if.c
+        ${SDK}/Application/Core/Src/stm32wlxx_hal_msp.c
+        ${SDK}/Application/Core/Src/stm32wlxx_it.c
+        ${SDK}/Application/Core/Src/system_stm32wlxx.c
+        ${SDK}/Application/Core/Src/timer_if.c
+        ${SDK}/Application/Core/Src/usart_if.c
+        ${SDK}/Application/Core/Src/util_if.c
+        ${SDK}/Application/Gateway/auth.c
+        ${SDK}/Application/Sensor/bme280/bme280.c
+        ${SDK}/Application/Sensor/bme280/bme280.h
+        ${SDK}/Application/Sensor/bme280/bme280_defs.h
+        ${SDK}/Application/Sensor/bme.c
+        ${SDK}/Application/Sensor/button.c
+        ${SDK}/Application/Sensor/config.c
+        ${SDK}/Application/Sensor/null.c
+        ${SDK}/Application/Sensor/ping.c
+        ${SDK}/Application/Sensor/pir.c
+        ${SDK}/Application/Sensor/sensor.h
+        ${SDK}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
+        ${SDK}/Application/STM32CubeIDE/sys/syscalls.c
+        ${SDK}/Application/STM32CubeIDE/sys/sysmem.c
+        ${SDK}/Application/board.h
+        ${SDK}/Application/board_radio.h
+        ${SDK}/Application/config_notecard.h
+        ${SDK}/Application/config_radio.h
+        ${SDK}/Application/config_sys.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_armcc.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_armclang.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_armclang_ltm.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_compiler.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_gcc.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_iccarm.h
+        ${SDK}/Drivers/CMSIS/Core/Include/cmsis_version.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_armv81mml.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_armv8mbl.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_armv8mml.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm0.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm0plus.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm1.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm23.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm3.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm33.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm35p.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm4.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_cm7.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_sc000.h
+        ${SDK}/Drivers/CMSIS/Core/Include/core_sc300.h
+        ${SDK}/Drivers/CMSIS/Core/Include/mpu_armv7.h
+        ${SDK}/Drivers/CMSIS/Core/Include/mpu_armv8.h
+        ${SDK}/Drivers/CMSIS/Core/Include/tz_context.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/stm32wl54xx.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/stm32wl55xx.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/stm32wle4xx.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/stm32wle5xx.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/stm32wlxx.h
+        ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include/system_stm32wlxx.h
+        ${SDK}/Drivers/CMSIS/DSP/Include/arm_common_tables.h
+        ${SDK}/Drivers/CMSIS/DSP/Include/arm_const_structs.h
+        ${SDK}/Drivers/CMSIS/DSP/Include/arm_math.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_armcc.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_armclang.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_armclang_ltm.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_compiler.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_gcc.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_iccarm.h
+        ${SDK}/Drivers/CMSIS/Include/cmsis_version.h
+        ${SDK}/Drivers/CMSIS/Include/core_armv81mml.h
+        ${SDK}/Drivers/CMSIS/Include/core_armv8mbl.h
+        ${SDK}/Drivers/CMSIS/Include/core_armv8mml.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm0.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm0plus.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm1.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm23.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm3.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm33.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm35p.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm4.h
+        ${SDK}/Drivers/CMSIS/Include/core_cm7.h
+        ${SDK}/Drivers/CMSIS/Include/core_sc000.h
+        ${SDK}/Drivers/CMSIS/Include/core_sc300.h
+        ${SDK}/Drivers/CMSIS/Include/mpu_armv7.h
+        ${SDK}/Drivers/CMSIS/Include/mpu_armv8.h
+        ${SDK}/Drivers/CMSIS/Include/tz_context.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_adc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_adc_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_comp.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_cortex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_crc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_crc_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_cryp.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_cryp_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_dac.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_dac_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_def.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_dma.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_dma_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_exti.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_flash.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_flash_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_gpio.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_gpio_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_gtzc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_hsem.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_i2c.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_i2c_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_i2s.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_ipcc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_irda.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_irda_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_iwdg.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_lptim.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_pka.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_pwr.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_pwr_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rcc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rcc_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rng.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rng_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rtc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_rtc_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_smartcard.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_smartcard_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_smbus.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_spi.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_spi_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_subghz.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_tim.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_tim_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_uart.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_uart_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_usart.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_usart_ex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_hal_wwdg.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_adc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_bus.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_comp.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_cortex.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_crc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_dac.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_dma.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_dmamux.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_exti.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_gpio.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_hsem.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_i2c.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_ipcc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_iwdg.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_lptim.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_lpuart.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_pka.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_pwr.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_rcc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_rng.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_rtc.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_spi.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_system.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_tim.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_usart.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_utils.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/stm32wlxx_ll_wwdg.h
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_comp.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cortex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_exti.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gpio.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gtzc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_hsem.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2s.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_ipcc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_irda.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_iwdg.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_lptim.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pka.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smbus.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_subghz.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart_ex.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_wwdg.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_adc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_comp.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_crc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_dac.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_dma.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_exti.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_gpio.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_i2c.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_lptim.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_lpuart.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_pka.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_pwr.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rcc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rng.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rtc.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_spi.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_tim.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_usart.c
+        ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_utils.c
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.c
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.h
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/subghz_phy_version.h
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/radio.h
+        ${SDK}/Middlewares/Third_Party/SubGHz_Phy/radio_ex.h
+        ${NOTE_C}/n_atof.c
+        ${NOTE_C}/n_b64.c
+        ${NOTE_C}/n_cjson.c
+        ${NOTE_C}/n_cjson.h
+        ${NOTE_C}/n_cjson_helpers.c
+        ${NOTE_C}/n_const.c
+        ${NOTE_C}/n_ftoa.c
+        ${NOTE_C}/n_helpers.c
+        ${NOTE_C}/n_hooks.c
+        ${NOTE_C}/n_i2c.c
+        ${NOTE_C}/n_lib.h
+        ${NOTE_C}/n_md5.c
+        ${NOTE_C}/n_printf.c
+        ${NOTE_C}/n_request.c
+        ${NOTE_C}/n_serial.c
+        ${NOTE_C}/n_str.c
+        ${NOTE_C}/n_ua.c
+        ${NOTE_C}/note.h
+        ${SDK}/Utilities/lpm/tiny_lpm/stm32_lpm.c
+        ${SDK}/Utilities/lpm/tiny_lpm/stm32_lpm.h
+        ${SDK}/Utilities/misc/stm32_mem.c
+        ${SDK}/Utilities/misc/stm32_mem.h
+        ${SDK}/Utilities/misc/stm32_systime.c
+        ${SDK}/Utilities/misc/stm32_systime.h
+        ${SDK}/Utilities/misc/stm32_tiny_sscanf.c
+        ${SDK}/Utilities/misc/stm32_tiny_sscanf.h
+        ${SDK}/Utilities/misc/stm32_tiny_vsnprintf.c
+        ${SDK}/Utilities/misc/stm32_tiny_vsnprintf.h
+        ${SDK}/Utilities/sequencer/stm32_seq.c
+        ${SDK}/Utilities/sequencer/stm32_seq.h
+        ${SDK}/Utilities/timer/stm32_timer.c
+        ${SDK}/Utilities/timer/stm32_timer.h
+        ${SDK}/Utilities/trace/adv_trace/stm32_adv_trace.c
+        ${SDK}/Utilities/trace/adv_trace/stm32_adv_trace.h
+        )
+
+target_compile_definitions(${EXECUTABLE} PRIVATE
+        -DSTM32WL55xx
+        -DCORE_CM4
+        )
+
+target_compile_options(${EXECUTABLE} PRIVATE
+        -mcpu=cortex-m4
+        -c
+        -ffunction-sections
+        -fdata-sections
+        -O0 -g3
+        -Wall
+        -fstack-usage
+        -MMD
+        -MP
+        --specs=nano.specs
+        -mfloat-abi=soft
+        -mthumb
+        )
+
+target_link_options(${EXECUTABLE} PRIVATE
+        -T${SDK}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
+        -mcpu=cortex-m4
+        --specs=nosys.specs
+        -Wl,-Map="${PROJECT_NAME}.map"
+        -Wl,--gc-sections
+        -static
+        --specs=nano.specs
+        -mfloat-abi=soft
+        -mthumb
+        -Wl,--start-group -lc -lm -Wl,--end-group
+        -Wl,--print-memory-usage
+        )
+
+# Print executable size
+add_custom_command(TARGET ${EXECUTABLE}
+        POST_BUILD
+        COMMAND arm-none-eabi-size ${EXECUTABLE})
+
+# Create hex file
+add_custom_command(TARGET ${EXECUTABLE}
+        POST_BUILD
+        COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
+        COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin)
