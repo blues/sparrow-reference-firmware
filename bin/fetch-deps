@@ -1,3 +1,5 @@
 #!/bin/sh
-[ -d sparrow-lora ] || git clone https://github.com/blues/sparrow-lora
-[ -d note-c ] || git clone https://github.com/blues/note-c
+# deliberately not recursive while the note-c submodule in sparrow-lora is broken
+git submodule update --init 
+# [ -d sparrow-lora ] || git clone https://github.com/blues/sparrow-lora
+# [ -d note-c ] || git clone https://github.com/blues/note-c

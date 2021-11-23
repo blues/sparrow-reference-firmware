@@ -1,0 +1,6 @@
+[submodule "sparrow-lora"]
+	path = sparrow-lora
+	url = https://github.com/blues/sparrow-lora
+[submodule "note-c"]
+	path = note-c
+	url = https://github.com/blues/note-c
