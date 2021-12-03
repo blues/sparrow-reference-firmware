@@ -13,15 +13,26 @@
 
 // States for the local state machine
 #define STATE_DIAG_CHECK            0
+#define STATE_DIAG_ISR_XFER         1
 
 // Special request IDs
-#define REQUESTID_TEMPLATE          1
+#define REQUESTID_TEMPLATE          2
 
 // The filename of the test database.  Note that * is replaced by the
 // gateway with the sensor's ID, while the # is a special character
 // reserved by the notecard and notehub for a Sensor ID that is
 // appended to the device ID within Events.
 #define SENSORDATA_NOTEFILE         "*#diag.qo"
+
+typedef struct ISR_parameters {
+    int sensorID;
+    uint16_t pins;
+} ISR_parameters;
+
+// Call ring-buffer
+volatile size_t isr_count = 0;
+volatile bool isr_overflow = false;
+ISR_parameters isr_params[8];
 
 // TRUE if we've successfully registered the template
 static bool templateRegistered = false;
@@ -30,7 +41,6 @@ static bool done = false;
 // Forwards
 static void addNote(bool immediate);
 static bool registerNotefileTemplate(void);
-static void resetInterrupt(void);
 
 // Our sensor ID
 static int sensorID = -1;
@@ -39,6 +49,8 @@ static int sensorID = -1;
 bool diagActivate(int sensorID)
 {
     APP_PRINTF("diag: Entered sensor callback function: %s\r\n\tsensorId: %d\r\n", __FUNCTION__, sensorID);
+    done = false;
+
     // Success
     return true;
 }
@@ -74,11 +86,17 @@ bool diagInit(void)
 // Interrupt handler
 void diagISR(int sensorID, uint16_t pins)
 {
-    APP_PRINTF("diag: Entered sensor callback function: %s\r\n\tsensorId: %d\tpins: %d\r\n", __FUNCTION__, sensorID, pins);
-	resetInterrupt();
+    /*
+     * This callback function is executed directly from the ISR.
+     * Only perform ISR sensitive operations and exit quickly.
+     */
+    isr_params[isr_count].sensorID = sensorID;
+    isr_params[isr_count].pins = pins;
+    isr_count = (~0xFFFFFFF8 & ++isr_count);
+    isr_overflow = !isr_count;
 
-	if (!schedIsActive(sensorID)) {
-		schedActivateNowFromISR(sensorID, true, STATE_DIAG_CHECK);
+	if (!schedIsActive(sensorID) && (pins & BUTTON1_Pin)) {
+        schedActivateNowFromISR(sensorID, true, STATE_DIAG_ISR_XFER);
     }
 
 	return;
@@ -97,12 +115,22 @@ void diagPoll(int sensorID, int state)
     case STATE_ACTIVATED:
         if (!templateRegistered) {
             registerNotefileTemplate();
-            schedSetCompletionState(sensorID, STATE_ACTIVATED, STATE_DIAG_CHECK);
+            schedSetCompletionState(sensorID, STATE_DIAG_CHECK, STATE_ACTIVATED);
             APP_PRINTF("diag: template registration request\r\n");
-            break;
+        } else {
+            schedSetState(sensorID, STATE_DIAG_CHECK, "diag: process diagnostics");
         }
+        break;
 
-    // fall through to do a report diagnostics
+    case STATE_DIAG_ISR_XFER:
+        APP_PRINTF("diag: Transfered from sensor ISR callback function.\r\n");
+        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (isr_overflow ? "more than" : ""), (isr_overflow ? 8 : isr_count));
+        for (size_t i = 0 ; i < isr_count ; ++i) {
+            APP_PRINTF("diag: call %d:\tsensorId: %d\tpins: %d\r\n", i, isr_params[i].sensorID, isr_params[i].pins);
+        }
+        isr_count = 0;
+        isr_overflow = false;
+        // fall through to do a report diagnostics
 
     case STATE_DIAG_CHECK:
         if (done) {
@@ -113,6 +141,7 @@ void diagPoll(int sensorID, int state)
         addNote(true);
         schedSetCompletionState(sensorID, STATE_DIAG_CHECK, STATE_DIAG_CHECK);
         APP_PRINTF("diag: note queued\r\n");
+        done = true;
         break;
     }
 }
@@ -211,27 +240,4 @@ static bool registerNotefileTemplate()
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
     return true;
-}
-
-static void resetInterrupt()
-{
-    GPIO_InitTypeDef init = {0};
-    init.Mode = GPIO_MODE_OUTPUT_PP;
-    init.Pull = GPIO_NOPULL;
-    init.Speed = GPIO_SPEED_FREQ_LOW;
-    init.Pin = PIR_DIRECT_LINK_Pin;
-    HAL_GPIO_Init(PIR_DIRECT_LINK_Port, &init);
-    HAL_GPIO_WritePin(PIR_DIRECT_LINK_Port, PIR_DIRECT_LINK_Pin, GPIO_PIN_RESET);
-    HAL_DelayUs(250);                   // Must be held low for at least 35uS
-    // Note that the datasheet suggests that this should be NOPULL, but I have
-    // tested PULLDOWN and the PIR's active state is strong enough that it works.
-    // This is important so that if the PIR is not mounted on the board we
-    // don't have an open input that is generating random interrupts with noise.
-    init.Mode = GPIO_MODE_IT_RISING;
-    init.Pull = GPIO_PULLDOWN;
-    init.Speed = GPIO_SPEED_FREQ_HIGH;
-    init.Pin = PIR_DIRECT_LINK_Pin;
-    HAL_GPIO_Init(PIR_DIRECT_LINK_Port, &init);
-    HAL_NVIC_SetPriority(PIR_DIRECT_LINK_EXTI_IRQn, PIR_DIRECT_LINK_IT_PRIORITY, 0x00);
-    HAL_NVIC_EnableIRQ(PIR_DIRECT_LINK_EXTI_IRQn);
 }

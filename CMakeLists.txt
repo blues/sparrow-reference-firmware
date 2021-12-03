@@ -17,8 +17,33 @@ set(CMAKE_C_EXTENSIONS ON)  # required for inline asm
 set(EXECUTABLE sparrow)
 
 # Create variables to alias path names
-set(SDK ${CMAKE_SOURCE_DIR}/sparrow-lora)
-set(NOTE_C ${CMAKE_SOURCE_DIR}/note-c)
+set(SDK ${CMAKE_CURRENT_LIST_DIR}/sparrow-lora)
+set(NOTE_C ${CMAKE_CURRENT_LIST_DIR}/note-c)
+set(USER_DEFINED_SENSORS ${CMAKE_CURRENT_LIST_DIR}/user-defined-sensors)
+
+# Set global compile settings
+add_compile_definitions(
+    STM32WL55xx
+    CORE_CM4
+)
+add_compile_options(
+    -mcpu=cortex-m4
+    # -std=gnu11
+    -g3
+    -c
+    -O0
+    -ffunction-sections
+    -fdata-sections
+    -Wall
+    -Wextra
+    -Wpedantic
+    -fstack-usage
+    -MMD
+    -MP
+    --specs=nano.specs
+    -mfloat-abi=soft
+    -mthumb
+)
 
 # Compile `note-c` seperately
 add_library(note-c STATIC
@@ -43,25 +68,10 @@ target_include_directories(note-c
     PUBLIC ${NOTE_C}
 )
 
-add_executable(${EXECUTABLE}
-    ${SDK}/Application/App/app.c
-    ${SDK}/Application/App/appinit.c
-    ${SDK}/Application/App/atp.c
-    ${SDK}/Application/App/dfu.c
-    ${SDK}/Application/App/dfuload.c
-    ${SDK}/Application/App/flash.c
-    ${SDK}/Application/App/gateway.c
-    ${SDK}/Application/App/led.c
-    ${SDK}/Application/App/note.c
-    ${SDK}/Application/App/post.c
-    ${SDK}/Application/App/radioinit.c
-    ${SDK}/Application/App/sched.c
-    ${SDK}/Application/App/sensor.c
-    ${SDK}/Application/App/trace.c
-    ${SDK}/Application/App/util.c
+# Compile ST platform seperately
+add_library(st OBJECT
     ${SDK}/Application/Core/Radio/radio_board_if.c
     ${SDK}/Application/Core/Src/debug.c
-    ${SDK}/Application/Core/Src/main.c
     ${SDK}/Application/Core/Src/stm32_lpm_if.c
     ${SDK}/Application/Core/Src/stm32wlxx_hal_msp.c
     ${SDK}/Application/Core/Src/stm32wlxx_it.c
@@ -69,13 +79,6 @@ add_executable(${EXECUTABLE}
     ${SDK}/Application/Core/Src/timer_if.c
     ${SDK}/Application/Core/Src/usart_if.c
     ${SDK}/Application/Core/Src/util_if.c
-    ${SDK}/Application/Gateway/auth.c
-    ${SDK}/Application/Sensor/bme280/bme280.c
-    ${SDK}/Application/Sensor/bme.c
-    ${SDK}/Application/Sensor/button.c
-    ${SDK}/Application/Sensor/init.c
-    ${SDK}/Application/Sensor/ping.c
-    ${SDK}/Application/Sensor/pir.c
     ${SDK}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
     ${SDK}/Application/STM32CubeIDE/sys/syscalls.c
     ${SDK}/Application/STM32CubeIDE/sys/sysmem.c
@@ -127,24 +130,6 @@ add_executable(${EXECUTABLE}
     ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart.c
     ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart_ex.c
     ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_wwdg.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_adc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_comp.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_crc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_dac.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_dma.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_exti.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_gpio.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_i2c.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_lptim.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_lpuart.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_pka.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_pwr.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rcc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rng.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_rtc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_spi.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_tim.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_usart.c
     ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_utils.c
     ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c
     ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.c
@@ -158,68 +143,127 @@ add_executable(${EXECUTABLE}
     ${SDK}/Utilities/trace/adv_trace/stm32_adv_trace.c
 )
 
-target_include_directories(${EXECUTABLE}
+target_include_directories(st SYSTEM
     PRIVATE ${SDK}/Application
-    PRIVATE ${SDK}/Application/App
-    PRIVATE ${SDK}/Application/Core/Inc
+    PUBLIC ${SDK}/Application/Core/Inc
     PRIVATE ${SDK}/Application/Core/Radio
-    PRIVATE ${SDK}/Application/Sensor
-    PRIVATE ${SDK}/Application/Sensor/bme280
-    SYSTEM ${SDK}/Drivers/CMSIS/Core/Include
-    SYSTEM ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include
-    SYSTEM ${SDK}/Drivers/CMSIS/DSP/Include
-    SYSTEM ${SDK}/Drivers/CMSIS/Include
-    SYSTEM ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc
-    SYSTEM ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy
-    SYSTEM ${SDK}/Middlewares/Third_Party/SubGHz_Phy
-    SYSTEM ${SDK}/Middlewares/Third_Party/SubGHz_Phy/Conf
-    SYSTEM ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver
-    SYSTEM ${SDK}/Utilities/lpm/tiny_lpm
-    SYSTEM ${SDK}/Utilities/misc
-    SYSTEM ${SDK}/Utilities/sequencer
-    SYSTEM ${SDK}/Utilities/timer
-    SYSTEM ${SDK}/Utilities/trace/adv_trace
+    PRIVATE ${SDK}/Drivers/CMSIS/Core/Include
+    PUBLIC ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include
+    PRIVATE ${SDK}/Drivers/CMSIS/DSP/Include
+    PUBLIC ${SDK}/Drivers/CMSIS/Include
+    PUBLIC ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc
+    PRIVATE ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy
+    PUBLIC ${SDK}/Middlewares/Third_Party/SubGHz_Phy
+    PRIVATE ${SDK}/Middlewares/Third_Party/SubGHz_Phy/Conf
+    PRIVATE ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver
+    PUBLIC ${SDK}/Utilities/lpm/tiny_lpm
+    PUBLIC ${SDK}/Utilities/misc
+    PUBLIC ${SDK}/Utilities/sequencer
+    PUBLIC ${SDK}/Utilities/timer
+    PUBLIC ${SDK}/Utilities/trace/adv_trace
 )
 
-# Add `note-c` dependency relationship
-target_link_libraries(${EXECUTABLE} PRIVATE
+target_compile_options(st
+    PRIVATE -Wno-extra
+    PRIVATE -Wno-pedantic
+)
+
+# Compile Sparrow Runtime
+add_library(sparrow-runtime OBJECT
+    ${SDK}/Application/App/app.c
+    ${SDK}/Application/App/appinit.c
+    ${SDK}/Application/App/atp.c
+    ${SDK}/Application/App/dfu.c
+    ${SDK}/Application/App/dfuload.c
+    ${SDK}/Application/App/flash.c
+    ${SDK}/Application/App/gateway.c
+    ${SDK}/Application/App/led.c
+    ${SDK}/Application/App/note.c
+    ${SDK}/Application/App/post.c
+    ${SDK}/Application/App/radioinit.c
+    ${SDK}/Application/App/sched.c
+    ${SDK}/Application/App/sensor.c
+    ${SDK}/Application/App/trace.c
+    ${SDK}/Application/App/util.c
+    ${SDK}/Application/Gateway/auth.c
+    ${SDK}/Application/Sensor/bme280/bme280.c
+    ${SDK}/Application/Sensor/bme.c
+    ${SDK}/Application/Sensor/button.c
+    ${SDK}/Application/Sensor/init.c
+    ${SDK}/Application/Sensor/ping.c
+    ${SDK}/Application/Sensor/pir.c
+)
+
+target_include_directories(sparrow-runtime
+    PUBLIC ${SDK}/Application
+    PUBLIC ${SDK}/Application/App
+    PUBLIC ${SDK}/Application/Sensor
+    PUBLIC ${SDK}/Application/Sensor/bme280
+)
+
+add_dependencies(sparrow-runtime
     note-c
+    st
 )
 
-target_compile_definitions(${EXECUTABLE} PRIVATE
-    -DSTM32WL55xx
-    -DCORE_CM4
+target_link_libraries(sparrow-runtime
+    PUBLIC note-c
+    PUBLIC st
 )
 
-target_compile_options(${EXECUTABLE} PRIVATE
-    -mcpu=cortex-m4
-#    -std=gnu11
-    -g3
-    -c
-    -O0
-    -ffunction-sections
-    -fdata-sections
-    -Wall
-    -fstack-usage
-    -MMD
-    -MP
-    --specs=nano.specs
-    -mfloat-abi=soft
-    -mthumb
+# Pull in user-defined sensors
+if(IS_DIRECTORY ${USER_DEFINED_SENSORS})
+    if(EXISTS ${USER_DEFINED_SENSORS}/CMakeLists.txt)
+        add_subdirectory(${USER_DEFINED_SENSORS})
+        if (NOT TARGET user-defined-sensors)
+            message(WARNING "Could not find the user-defined-sensors target. No user-defined sensors will be imported")
+        endif()
+    else()
+        message(WARNING "Could not find CMakeList.txt. No user-defined sensors will be imported.")
+    endif()
+endif()
+
+# Generate .elf .bin .hex .map and .list files
+add_executable(${EXECUTABLE}
+    ${SDK}/Application/Core/Src/main.c
 )
 
-target_link_options(${EXECUTABLE} PRIVATE
-    -mcpu=cortex-m4
-    -T${SDK}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
-    --specs=nosys.specs
-    -Wl,-Map=${PROJECT_NAME}.map
-    -Wl,--gc-sections
-    -static
-    --specs=nano.specs
-    -mfloat-abi=soft
-    -mthumb
-    -Wl,--start-group -lc -lm -Wl,--end-group
-    -Wl,--print-memory-usage
+add_dependencies(${EXECUTABLE}
+    sparrow-runtime
+    st
+)
+
+target_link_libraries(${EXECUTABLE}
+    PRIVATE sparrow-runtime
+    PRIVATE st
+)
+
+if (TARGET user-defined-sensors)
+    target_sources(${EXECUTABLE}
+        PRIVATE ${USER_DEFINED_SENSORS}/register.c
+    )
+
+    add_dependencies(${EXECUTABLE}
+        user-defined-sensors
+    )
+
+    target_link_libraries(${EXECUTABLE}
+        PRIVATE user-defined-sensors
+    )
+endif()
+
+target_link_options(${EXECUTABLE}
+    PRIVATE -mcpu=cortex-m4
+    PRIVATE -T${SDK}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
+    PRIVATE --specs=nosys.specs
+    PRIVATE -Wl,-Map=${PROJECT_NAME}.map
+    PRIVATE -Wl,--gc-sections
+    PRIVATE -static
+    PRIVATE --specs=nano.specs
+    PRIVATE -mfloat-abi=soft
+    PRIVATE -mthumb
+    PRIVATE -Wl,--start-group -lc -lm -Wl,--end-group
+    PRIVATE -Wl,--print-memory-usage
 )
 
 # Additional ARM processing
@@ -232,7 +276,7 @@ add_custom_command(TARGET ${EXECUTABLE}
     COMMAND ${CMAKE_SIZE_UTIL} ${EXECUTABLE}.elf
 
     # Create list file
-    COMMAND ${CMAKE_OBJDUMP} -h -S  ${EXECUTABLE}.elf  > ${EXECUTABLE}.list
+    COMMAND ${CMAKE_OBJDUMP} -hS ${EXECUTABLE}.elf > ${EXECUTABLE}.list
 
     # Create hex file
     COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE}.elf ${EXECUTABLE}.hex
