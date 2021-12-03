@@ -18,7 +18,7 @@ set(EXECUTABLE sparrow)
 
 # Create variables to alias path names
 set(SDK ${CMAKE_SOURCE_DIR}/sparrow-lora)
-set(NOTE_C ${SDK}/note-c)
+set(NOTE_C ${CMAKE_SOURCE_DIR}/note-c)
 
 # Compile `note-c` seperately
 add_library(note-c STATIC
