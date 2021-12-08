@@ -1,0 +1,300 @@
+// Copyright 2021 Blues Inc.  All rights reserved.
+// Use of this source code is governed by licenses granted by the
+// copyright holder including that found in the LICENSE file.
+
+#include "ping.h"
+
+// Sparrow Header(s)
+#include <sensor.h>
+
+// States for the local state machine
+#define STATE_BUTTON                0
+
+// Special request IDs
+#define REQUESTID_MANUAL_PING       1
+#define REQUESTID_TEMPLATE          2
+
+// The filename of the test database.  Note that * is replaced by the
+// gateway with the sensor's ID, while the # is a special character
+// reserved by the notecard and notehub for a Sensor ID that is
+// appended to the device ID within Events.
+#define SENSORDATA_NOTEFILE         "*#data.qo"
+
+// TRUE if we've successfully registered the template
+#if !SURVEY_MODE
+static bool templateRegistered = false;
+#endif
+
+// Our sensor ID
+static int sensorID = -1;
+
+// Forwards
+static bool sendHealthLogMessage(bool immediate);
+#if !SURVEY_MODE
+static void addNote(uint32_t count);
+static bool registerNotefileTemplate(void);
+#endif
+
+// Sensor One-Time Init
+bool pingInit()
+{
+
+    // Register the sensor
+    sensorConfig config = {
+        .name = "ping",
+        .activationPeriodSecs = 60 * 15,
+        .pollIntervalSecs = 15,
+        .activateFn = NULL,
+        .interruptFn = pingISR,
+        .pollFn = pingPoll,
+        .responseFn = pingResponse,
+    };
+    sensorID = schedRegisterSensor(&config);
+    if (sensorID < 0) {
+        return false;
+    }
+
+    // Done
+    return true;
+
+}
+
+// Poller
+void pingPoll(int sensorID, int state)
+{
+
+    // Switch based upon state
+    switch (state) {
+
+    // Sensor was just activated, so simulate the
+    // sensor sampling something and adding a note
+    // to the notefile.
+    case STATE_ACTIVATED:
+
+#if SURVEY_MODE
+
+        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        break;
+
+#else
+
+        // If the template isn't registered, do so
+        if (!templateRegistered) {
+            registerNotefileTemplate();
+            schedSetCompletionState(sensorID, STATE_ACTIVATED, STATE_DEACTIVATED);
+            APP_PRINTF("ping: template registration request\r\n");
+            break;
+        }
+
+        // Add a note to the file
+        static int notecount = 0;
+        addNote(++notecount);
+        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        APP_PRINTF("ping: note queued\r\n");
+        break;
+
+#endif  // SURVEY_MODE
+
+    // When a button is pressed, send a log message
+    // and wait for confirmation response all the
+    // way from the notecard. Make sure we do this
+    // at the maximum power level because frequently
+    // this button is used as a "test button" when
+    // walking around to test range.
+    case STATE_BUTTON:
+        atpMaximizePowerLevel();
+        ledIndicateAck(1);
+        sendHealthLogMessage(true);
+        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        APP_PRINTF("ping: sent health update\r\n");
+        break;
+
+    }
+
+}
+
+// Interrupt handler
+void pingISR(int sensorID, uint16_t pins)
+{
+
+    // Set the state to button, and immediately schedule
+    if ((pins & BUTTON1_Pin) != 0) {
+        schedActivateNowFromISR(sensorID, true, STATE_BUTTON);
+        return;
+    }
+
+}
+
+// Send a note to the health log, and request a reply just
+// as a validation of bidirectional communications continuity.
+// Note that this method uses "sensorIgnoreTimeWindow()" which
+// is NOT AT ALL a good practice because it can step on other
+// devices' communications, however because this message is
+// being sent by a button-press there is benefit in an
+// immediate request/reply.
+bool sendHealthLogMessage(bool immediate)
+{
+
+    // Create the new request
+    J *req = NoteNewRequest("hub.log");
+    if (req == NULL) {
+        return false;
+    }
+
+    // Create a body for the request
+    J *body = JCreateObject();
+    if (body == NULL) {
+        JDelete(req);
+        return false;
+    }
+
+    // Format the health message
+    char message[80];
+    utilAddressToText(ourAddress, message, sizeof(message));
+    if (sensorName[0] != '\0') {
+        strlcat(message, " (", sizeof(message));
+        strlcat(message, sensorName, sizeof(message));
+        strlcat(message, ")", sizeof(message));
+    }
+    strlcat(message, " says hello", sizeof(message));
+    JAddStringToObject(req, "text", message);
+
+    // Notify the gateway that we wish to add RSSI/SNR info to the text
+    JAddBoolToObject(req, "radio", true);
+
+    // Add an ID to the request, which will be echo'ed
+    // back in the response by the notecard itself.  This
+    // helps us to identify the asynchronous response
+    // without needing to have an additional state.
+    JAddNumberToObject(req, "id", REQUESTID_MANUAL_PING);
+
+    // If immediate send is requested, ignore the
+    // time window and just send it now.  Also, set
+    // the sync flag so that when it arrives on the
+    // gateway it is synced immediately to the notehub.
+    if (immediate) {
+        sensorIgnoreTimeWindow();
+        JAddBoolToObject(req, "sync", true);
+    }
+
+    // Send the request with the "true" argument meaning
+    // that the notecard's response should be sent
+    // all the way back from the gateway to us, rather
+    // than discarding the response.
+    noteSendToGatewayAsync(req, true);
+    return true;
+
+}
+
+// Register the notefile template for our data
+#if !SURVEY_MODE
+static bool registerNotefileTemplate()
+{
+
+    // Create the request
+    J *req = NoteNewRequest("note.template");
+    if (req == NULL) {
+        return false;
+    }
+
+    // Create the body
+    J *body = JCreateObject();
+    if (body == NULL) {
+        JDelete(req);
+        return false;
+    }
+
+    // Add an ID to the request, which will be echo'ed
+    // back in the response by the notecard itself.  This
+    // helps us to identify the asynchronous response
+    // without needing to have an additional state.
+    JAddNumberToObject(req, "id", REQUESTID_TEMPLATE);
+
+    // Fill-in request parameters.  Note that in order to minimize
+    // the size of the over-the-air JSON we're using a special format
+    // for the "file" parameter implemented by the gateway, in which
+    // a "file" parameter beginning with * will have that character
+    // substituted with the textified sensor address.
+    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+
+    // Fill-in the body template
+    JAddNumberToObject(body, "count", TINT32);
+    JAddStringToObject(body, "sensor", TSTRING(40));
+
+    // Attach the body to the request, and send it to the gateway
+    JAddItemToObject(req, "body", body);
+    noteSendToGatewayAsync(req, true);
+    return true;
+
+}
+#endif
+
+// Send the periodic ping
+#if !SURVEY_MODE
+static void addNote(uint32_t count)
+{
+
+    // Create the request
+    J *req = NoteNewRequest("note.add");
+    if (req == NULL) {
+        return;
+    }
+
+    // Create the body
+    J *body = JCreateObject();
+    if (body == NULL) {
+        JDelete(req);
+        return;
+    }
+
+    // Set the target notefile
+    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+
+    // Fill-in the body
+    JAddNumberToObject(body, "count", count);
+    if (sensorName[0] != '\0') {
+        JAddStringToObject(body, "sensor", sensorName);
+    }
+
+    // Attach the body to the request, and send it to the gateway
+    JAddItemToObject(req, "body", body);
+    noteSendToGatewayAsync(req, false);
+
+}
+#endif
+
+// Gateway Response handler
+void pingResponse(int sensorID, J *rsp)
+{
+
+    // If this is a response timeout, indicate as such
+    if (rsp == NULL) {
+        APP_PRINTF("ping: response timeout\r\n");
+        return;
+    }
+
+    // See if there's an error
+    char *err = JGetString(rsp, "err");
+    if (err[0] != '\0') {
+        APP_PRINTF("sensor error response: %d\r\n", err);
+        return;
+    }
+
+    // Flash the LED if this is a response to this specific ping request
+    switch (JGetInt(rsp, "id")) {
+
+    case REQUESTID_MANUAL_PING:
+        ledIndicateAck(2);
+        APP_PRINTF("ping: SUCCESSFUL response\r\n");
+        break;
+
+#if !SURVEY_MODE
+    case REQUESTID_TEMPLATE:
+        templateRegistered = true;
+        APP_PRINTF("ping: SUCCESSFUL template registration\r\n");
+        break;
+#endif
+
+    }
+
+}
