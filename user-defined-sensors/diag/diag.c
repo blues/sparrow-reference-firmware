@@ -29,10 +29,10 @@ typedef struct ISR_parameters {
     uint16_t pins;
 } ISR_parameters;
 
-// Call ring-buffer
-volatile size_t isr_count = 0;
-volatile bool isr_overflow = false;
-ISR_parameters isr_params[8];
+// ISR call ring-buffer
+static volatile size_t isr_count = 0;
+static volatile bool isr_overflow = false;
+static ISR_parameters isr_params[8];
 
 // TRUE if we've successfully registered the template
 static bool templateRegistered = false;
@@ -48,7 +48,7 @@ static int sensorID = -1;
 // Sensor Activation (on wake)
 bool diagActivate(int sensorID)
 {
-    APP_PRINTF("diag: Entered sensor callback function: %s\r\n\tsensorId: %d\r\n", __FUNCTION__, sensorID);
+    APP_PRINTF("diag: Entered sensor callback function: diagActivate\r\n\tsensorId: %d\r\n", sensorID);
     done = false;
 
     // Success
@@ -58,7 +58,7 @@ bool diagActivate(int sensorID)
 // Sensor One-Time Init
 bool diagInit(void)
 {
-    APP_PRINTF("diag: Entered sensor callback function: %s\r\n", __FUNCTION__);
+    APP_PRINTF("diag: Entered sensor callback function: diagInit\r\n");
     bool result = false;
 
     // Register the sensor
@@ -92,8 +92,9 @@ void diagISR(int sensorID, uint16_t pins)
      */
     isr_params[isr_count].sensorID = sensorID;
     isr_params[isr_count].pins = pins;
-    isr_count = (~0xFFFFFFF8 & ++isr_count);
-    isr_overflow = !isr_count;
+    ++isr_count;
+    isr_count = (~0xFFFFFFF8 & isr_count);
+    isr_overflow = (isr_overflow || !isr_count);
 
 	if (!schedIsActive(sensorID) && (pins & BUTTON1_Pin)) {
         schedActivateNowFromISR(sensorID, true, STATE_DIAG_ISR_XFER);
@@ -105,7 +106,7 @@ void diagISR(int sensorID, uint16_t pins)
 // Poller
 void diagPoll(int sensorID, int state)
 {
-    APP_PRINTF("diag: Entered sensor callback function: %s\r\n\tsensorId: %d\tstate: %s\r\n", __FUNCTION__, sensorID, schedStateName(state));
+    APP_PRINTF("diag: Entered sensor callback function: diagPoll\r\n\tsensorId: %d\tstate: %s\r\n", sensorID, schedStateName(state));
 //    if (appSKU() != SKU_REFERENCE) {
 //    	schedDisable(sensorID);
 //    }
@@ -149,7 +150,7 @@ void diagPoll(int sensorID, int state)
 // Gateway Response handler
 void diagResponse(int sensorID, J *rsp)
 {
-    APP_PRINTF("diag: Entered sensor callback function: %s\r\n\tsensorId: %d\trsp: %s\r\n", __FUNCTION__, sensorID, JConvertToJSONString(rsp));
+    APP_PRINTF("diag: Entered sensor callback function: diagResponse\r\n\tsensorId: %d\trsp: %s\r\n", sensorID, JConvertToJSONString(rsp));
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {

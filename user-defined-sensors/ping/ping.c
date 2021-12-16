@@ -266,6 +266,8 @@ static void addNote(uint32_t count)
 // Gateway Response handler
 void pingResponse(int sensorID, J *rsp)
 {
+    // Unused parameter(s)
+    (void)sensorID;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {

@@ -37,6 +37,7 @@ add_compile_options(
     -Wall
     -Wextra
     -Wpedantic
+    -Wimplicit-fallthrough=2
     -fstack-usage
     -MMD
     -MP
@@ -166,6 +167,7 @@ target_include_directories(st SYSTEM
 target_compile_options(st
     PRIVATE -Wno-extra
     PRIVATE -Wno-pedantic
+    PRIVATE -Wno-implicit-fallthrough
 )
 
 # Compile Sparrow Runtime

@@ -175,6 +175,8 @@ static bool registerNotefileTemplate()
 // Gateway Response handler
 void bmeResponse(int sensorID, J *rsp)
 {
+    // Unused parameter(s)
+    (void)sensorID;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -402,12 +404,18 @@ bool bme280_read(struct bme280_dev *dev, struct bme280_data *comp_data)
 // Delay
 void bme280_delay_us(uint32_t period, void *intf_ptr)
 {
+    // Unused parameter(s)
+    (void)intf_ptr;
+
     HAL_DelayUs(period);
 }
 
 // Read from sensor
 int8_t bme280_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
+    // Unused parameter(s)
+    (void)intf_ptr;
+
     bool success = MY_I2C2_ReadRegister(bme_dev_addr, reg_addr, reg_data, len, 5000);
     return (success ? BME280_INTF_RET_SUCCESS : !BME280_INTF_RET_SUCCESS);
 }
@@ -415,6 +423,9 @@ int8_t bme280_i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *
 // Write to sensor
 int8_t bme280_i2c_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
+    // Unused parameter(s)
+    (void)intf_ptr;
+
     bool success = MY_I2C2_WriteRegister(bme_dev_addr, reg_addr, (uint8_t *) reg_data, len, 5000);
     return (success ? BME280_INTF_RET_SUCCESS : !BME280_INTF_RET_SUCCESS);
 }

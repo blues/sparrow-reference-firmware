@@ -292,6 +292,8 @@ static bool registerNotefileTemplate()
 // Gateway Response handler
 void pirResponse(int sensorID, J *rsp)
 {
+    // Unused parameter(s)
+    (void)sensorID;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
