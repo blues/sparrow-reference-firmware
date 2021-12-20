@@ -58,7 +58,7 @@ RUN ["dash", "-c", "\
      --uid 1000 \
      \"blues\" \
 "]
-USER blues
+# USER blues
 
 # Build On Invocation (default)
 CMD ["dash", "-c", "\
