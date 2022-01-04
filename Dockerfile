@@ -25,12 +25,12 @@ RUN ["dash", "-c", "\
      ca-certificates \
      cmake \
      curl \
+     git \
      make \
  && apt-get clean \
  && apt-get purge \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 "]
-
 WORKDIR /root
 
 # Download/Install ARM Cross Compiler
@@ -52,13 +52,12 @@ RUN ["dash", "-c", "\
  && adduser \
      --disabled-password \
      --gecos \"\" \
-     --home \"$(pwd)\" \
      --ingroup \"blues\" \
-     --no-create-home \
      --uid 1000 \
      \"blues\" \
 "]
-# USER blues
+WORKDIR /home/blues
+USER blues
 
 # Build On Invocation (default)
 CMD ["dash", "-c", "\
