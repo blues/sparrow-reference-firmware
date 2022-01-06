@@ -2,7 +2,7 @@
 # docker build --tag sparrow-buildpack .
 
 # Launch development environment
-# docker run --rm --tty --volume "$(pwd)":/sparrow-sensor-framework/ sparrow-buildpack
+# docker run --rm --tty --user blues --volume "$(pwd)":/host-volume/ sparrow-buildpack
 
 # Define global arguments
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -56,15 +56,15 @@ RUN ["dash", "-c", "\
      --uid 1000 \
      \"blues\" \
 "]
-WORKDIR /home/blues
-USER blues
+
+# Set Execution Environment
+WORKDIR /host-volume
 
 # Build On Invocation (default)
 CMD ["dash", "-c", "\
-    cd /sparrow-sensor-framework/ \
- && rm -rf build/ \
+    rm -rf build/ \
  && mkdir build \
  && cd build/ \
  && cmake .. \
- && make -j16 \
+ && make -j \
 "]

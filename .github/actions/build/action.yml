@@ -1,0 +1,5 @@
+name: 'Build'
+description: 'Build using CMake and the ARM toolchain'
+runs:
+  using: 'docker'
+  image: '../../../Dockerfile'
