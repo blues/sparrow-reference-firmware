@@ -1,3 +1,8 @@
-/.vscode/
+# CMake Artifacts
 /build/
 /cmake-build-*
+
+# STM32CubeIDE Artifacts
+/.settings/
+/Debug/
+/Release/
