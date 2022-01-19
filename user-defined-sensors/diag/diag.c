@@ -18,6 +18,9 @@
 // Special request IDs
 #define REQUESTID_TEMPLATE          2
 
+#define ISR_MAX_CALL_RETENTION      8
+#define ISR_COUNTER_MASK            ~0xFFFFFFF8
+
 // The filename of the test database.  Note that * is replaced by the
 // gateway with the sensor's ID, while the # is a special character
 // reserved by the notecard and notehub for a Sensor ID that is
@@ -32,7 +35,7 @@ typedef struct ISR_parameters {
 // ISR call ring-buffer
 static volatile size_t isr_count = 0;
 static volatile bool isr_overflow = false;
-static ISR_parameters isr_params[8];
+static ISR_parameters isr_params[ISR_MAX_CALL_RETENTION];
 
 // TRUE if we've successfully registered the template
 static bool templateRegistered = false;
@@ -93,7 +96,7 @@ void diagISR(int sensorID, uint16_t pins)
     isr_params[isr_count].sensorID = sensorID;
     isr_params[isr_count].pins = pins;
     ++isr_count;
-    isr_count = (~0xFFFFFFF8 & isr_count);
+    isr_count = (ISR_COUNTER_MASK & isr_count);
     isr_overflow = (isr_overflow || !isr_count);
 
 	if (!schedIsActive(sensorID) && (pins & BUTTON1_Pin)) {
@@ -125,13 +128,13 @@ void diagPoll(int sensorID, int state)
 
     case STATE_DIAG_ISR_XFER:
         APP_PRINTF("diag: Transfered from sensor ISR callback function.\r\n");
-        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (isr_overflow ? "more than" : ""), (isr_overflow ? 8 : isr_count));
+        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (isr_overflow ? "more than" : ""), (isr_overflow ? ISR_MAX_CALL_RETENTION : isr_count));
         for (size_t i = 0 ; i < isr_count ; ++i) {
             APP_PRINTF("diag: call %d:\tsensorId: %d\tpins: %d\r\n", i, isr_params[i].sensorID, isr_params[i].pins);
         }
         isr_count = 0;
-        isr_overflow = false;
-        // fall through to do a report diagnostics
+        isr_overflow = false; // fall through
+        // now report diagnostics
 
     case STATE_DIAG_CHECK:
         if (done) {
@@ -144,6 +147,8 @@ void diagPoll(int sensorID, int state)
         APP_PRINTF("diag: note queued\r\n");
         done = true;
         break;
+    default:
+        ;
     }
 }
 
@@ -172,6 +177,8 @@ void diagResponse(int sensorID, J *rsp)
         templateRegistered = true;
         APP_PRINTF("diag: SUCCESSFUL template registration\r\n");
         break;
+    default:
+        ;
     }
 }
 
