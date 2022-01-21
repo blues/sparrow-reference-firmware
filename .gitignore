@@ -2,6 +2,9 @@
 /build/
 /cmake-build-*
 
+# Debug Artifacts
+/.vscode/.cortex-debug.registers.state.json
+
 # STM32CubeIDE Artifacts
 /.settings/
 /Debug/
