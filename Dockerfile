@@ -37,6 +37,7 @@ RUN ["dash", "-c", "\
      libusb-1.0-0 \
      libwebkit2gtk-4.0-37 \
      make \
+     nano \
      udev \
      unzip \
  && apt-get clean \
