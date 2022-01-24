@@ -1,0 +1,32 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Sparrow: Build Firmware using CMake and Make",
+            "type": "shell",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "command": [
+                "rm -rf ${workspaceRoot}/build/",
+                "&& mkdir ${workspaceRoot}/build",
+                "&& cd ${workspaceRoot}/build/",
+                "&& cmake ..",
+                "&& make -j"
+            ]
+        },
+        {
+            "label": "Sparrow: Flash Firmware using STM32_Programmer_CLI",
+            "type": "shell",
+            "command": [
+                "STM32_Programmer_CLI --connect port=SWD reset=HWrst --write ${workspaceRoot}/build/sparrow.elf --verify --go"
+            ]
+        }
+    ]
+}
