@@ -36,9 +36,9 @@ Prerequisites
 - [GNU ARM toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 - [VSCode “Cortex Debug” Extension](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug)
 
-> _**NOTE:** Be sure to add/install all tools/libraries into your system path.
+> _**NOTE:** Be sure to add/install all tools/libraries into your system path._
 >
-> This may be necessary of all tools, but is especially important for `ST-LINK_gdbserver` and it’s shared library dependency, `libSTLinkUSBDriver.so` (or platform specific equivalent)._
+> _This may be necessary of all tools, but is especially important for `ST-LINK_gdbserver` and it’s shared library dependency, `libSTLinkUSBDriver.so` (or platform specific equivalent)._
 
 VSCode Instructions
 ------------------
