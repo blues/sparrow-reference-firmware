@@ -7,7 +7,7 @@
         {
             "name": "Cortex Debug",
             "type": "cortex-debug",
-            "executable": "./build/sparrow.elf",
+            "executable": "${workspaceRoot}/build/sparrow.elf",
             "cwd": "${workspaceRoot}",
             "request": "launch",
             "servertype": "stlink",

@@ -13,6 +13,9 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
             "command": [
                 "rm -rf ${workspaceRoot}/build/",
                 "&& mkdir ${workspaceRoot}/build",
@@ -24,6 +27,7 @@
         {
             "label": "Sparrow: Flash Firmware using STM32_Programmer_CLI",
             "type": "shell",
+            "problemMatcher": [],
             "command": [
                 "STM32_Programmer_CLI --connect port=SWD reset=HWrst --write ${workspaceRoot}/build/sparrow.elf --verify --go"
             ]
