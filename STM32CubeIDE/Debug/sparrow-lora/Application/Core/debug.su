@@ -1,0 +1,16 @@
+stm32wlxx_ll_exti.h:337:22:LL_EXTI_EnableIT_32_63	16	static
+debug.c:30:6:MX_DBG_TxCpltCallback	16	static
+debug.c:36:6:HAL_UART_TxCpltCallback	16	static
+debug.c:44:6:MX_DBG_RxCallback	16	static
+debug.c:50:6:MX_DBG_Active	4	static
+debug.c:58:6:MX_DBG	24	static
+debug.c:85:6:MX_DBG_Suspend	8	static
+debug.c:96:6:MX_DBG_Resume	8	static
+debug.c:109:6:MX_DBG_Available	16	static
+debug.c:119:9:MX_DBG_Receive	32	static
+debug.c:146:6:dbgRestartReceive	16	static
+debug.c:161:6:dbgReceivedByteISR	24	static
+debug.c:190:6:MX_DBG_Disable	8	static
+debug.c:197:6:MX_DBG_Enabled	4	static
+debug.c:203:6:MX_DBG_Enable	8	static
+debug.c:210:6:MX_DBG_Init	32	static

@@ -3,7 +3,6 @@
 
 #include "diag/diag.h"
 
-int registerSensors (void) {
+void initSensors (void) {
     diagInit();
-    return 0;
 }

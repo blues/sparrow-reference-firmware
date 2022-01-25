@@ -1,0 +1,10 @@
+dfuload.c:43:21:dfuLoader	40	static,ignoring_inline_asm
+dfuload.c:82:28:local__NVIC_SystemReset	4	static,ignoring_inline_asm
+dfuload.c:96:28:local_HAL_FLASH_Unlock	4	static
+dfuload.c:106:28:local_HAL_FLASHEx_Erase	24	static
+dfuload.c:132:28:local_FLASH_WaitForLastOperation	16	static
+dfuload.c:163:28:local_FLASH_PageErase	16	static
+dfuload.c:173:28:local_FLASH_AcknowledgePageErase	4	static
+dfuload.c:183:28:local_FLASH_FlushCaches	4	static
+dfuload.c:210:28:local_HAL_FLASH_Program	24	static
+dfuload.c:229:28:local_FLASH_Program_DoubleWord	24	static,ignoring_inline_asm

@@ -1,0 +1,13 @@
+led.c:21:6:ledDisabled	16	static
+led.c:58:6:ledSet	8	static
+led.c:66:6:ledReset	8	static
+led.c:75:6:ledWalk	16	static
+led.c:84:6:ledIsPairMandatory	8	static
+led.c:90:6:ledIsPairInProgress	16	static
+led.c:125:6:ledIndicatePairInProgress	24	static
+led.c:135:6:ledIsReceiveInProgress	4	static
+led.c:141:6:ledIndicateReceiveInProgress	16	static
+led.c:152:6:ledIsTransmitInProgress	4	static
+led.c:158:6:ledIndicateTransmitInProgress	16	static
+led.c:169:6:ledIndicateAck	24	static
+led.c:180:10:ledButtonCheck	40	static

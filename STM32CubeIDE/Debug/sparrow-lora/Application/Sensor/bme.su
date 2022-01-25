@@ -1,0 +1,10 @@
+bme.c:55:6:bmeInit	72	static
+bme.c:95:6:bmePoll	16	static
+bme.c:127:13:registerNotefileTemplate	16	static
+bme.c:170:6:bmeResponse	32	static
+bme.c:198:13:addNote	64	static
+bme.c:256:6:bmeUpdate	192	static
+bme.c:351:6:bme280_read	24	static
+bme.c:397:6:bme280_delay_us	16	static
+bme.c:403:8:bme280_i2c_read	40	static
+bme.c:410:8:bme280_i2c_write	40	static

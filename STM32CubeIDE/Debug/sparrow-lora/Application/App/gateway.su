@@ -1,0 +1,6 @@
+gateway.c:27:6:gatewayProcessSensorRequest	168	static
+gateway.c:77:6:gatewayEnvVarsLoaded	8	static
+gateway.c:86:6:gatewayHousekeeping	592	static
+gateway.c:442:6:gatewaySetEnvVarDefaults	8	static
+gateway.c:451:6:gatewayUpdateEnvVar	16	static
+gateway.c:468:6:gatewayCmd	16	static

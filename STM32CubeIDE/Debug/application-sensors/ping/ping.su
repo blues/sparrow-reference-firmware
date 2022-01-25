@@ -1,0 +1,7 @@
+ping.c:39:6:pingInit	48	static
+ping.c:63:6:pingPoll	16	static
+ping.c:117:6:pingISR	16	static
+ping.c:135:6:sendHealthLogMessage	104	static
+ping.c:191:13:registerNotefileTemplate	16	static
+ping.c:234:13:addNote	24	static
+ping.c:267:6:pingResponse	32	static

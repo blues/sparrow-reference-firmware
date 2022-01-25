@@ -1,0 +1,2 @@
+util_if.c:13:6:MX_UTIL_Init	8	static
+util_if.c:38:6:UTIL_SEQ_Idle	8	static

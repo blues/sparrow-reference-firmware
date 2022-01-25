@@ -1,0 +1,5 @@
+n_ua.c:39:28:NoteUserAgentUpdate	16	static
+n_ua.c:54:26:NoteUserAgent	16	static
+n_ua.c:177:6:NoteSetUserAgent	16	static
+n_ua.c:187:6:NoteSetUserAgentOS	24	static
+n_ua.c:200:6:NoteSetUserAgentCPU	24	static

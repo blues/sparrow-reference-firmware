@@ -1,0 +1,7 @@
+stm32wlxx_ll_pwr.h:2197:22:LL_PWR_ClearFlag_C1STOP_C1STB	4	static
+stm32_lpm_if.c:21:6:PWR_EnterOffMode	4	static
+stm32_lpm_if.c:25:6:PWR_ExitOffMode	4	static
+stm32_lpm_if.c:29:6:PWR_EnterStopMode	8	static
+stm32_lpm_if.c:45:6:PWR_ExitStopMode	8	static
+stm32_lpm_if.c:61:6:PWR_EnterSleepMode	8	static
+stm32_lpm_if.c:70:6:PWR_ExitSleepMode	8	static

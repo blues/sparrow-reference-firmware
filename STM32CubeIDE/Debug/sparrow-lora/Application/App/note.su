@@ -1,0 +1,10 @@
+note.c:21:6:noteInit	16	static
+note.c:50:6:noteSetup	40	static
+note.c:122:6:noteBeginTransaction	8	static
+note.c:128:6:noteEndTransaction	8	static
+note.c:134:6:noteDelay	16	static
+note.c:140:19:noteMillis	8	static
+note.c:146:6:noteI2CReset	16	static
+note.c:156:13:noteI2CTransmit	48	static
+note.c:189:13:noteI2CReceive	64	static
+note.c:247:6:noteSendToGatewayAsync	16	static

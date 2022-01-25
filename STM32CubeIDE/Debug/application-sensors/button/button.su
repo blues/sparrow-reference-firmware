@@ -1,0 +1,5 @@
+button.c:23:6:buttonInit	48	static
+button.c:47:6:buttonPoll	16	static
+button.c:77:6:buttonISR	16	static
+button.c:95:6:sendHealthLogMessage	104	static
+button.c:150:6:buttonResponse	32	static

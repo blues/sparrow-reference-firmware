@@ -1,0 +1,10 @@
+n_ftoa.c:56:8:JNtoA	64	static
+n_ftoa.c:73:1:fmtflt	264	static
+n_ftoa.c:372:13:fmtstr	40	static
+n_ftoa.c:409:13:printsep	24	static
+n_ftoa.c:414:12:getnumsep	24	static
+n_ftoa.c:420:12:getexponent	40	static
+n_ftoa.c:442:12:convert	32	static
+n_ftoa.c:456:18:cast	32	static
+n_ftoa.c:480:18:myround	32	static
+n_ftoa.c:491:16:mypow10	24	static

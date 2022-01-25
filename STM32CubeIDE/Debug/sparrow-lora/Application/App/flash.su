@@ -1,0 +1,14 @@
+core_cm4.h:1933:34:__NVIC_SystemReset	4	static,ignoring_inline_asm
+flash.c:58:6:flashCodeParams	24	static
+flash.c:67:10:FLASH_Init	16	static
+flash.c:101:6:FLASH_write_at	40	static,ignoring_inline_asm
+flash.c:135:6:flashDFUInit	16	static
+flash.c:152:6:flashWrite	72	static
+flash.c:210:10:flashConfigPeers	4	static
+flash.c:216:6:flashConfigLoad	8	static
+flash.c:241:6:flashConfigUpdate	8	static
+flash.c:262:6:flashConfigFactoryReset	8	static
+flash.c:278:6:flashConfigFindPeerByType	32	static
+flash.c:298:6:flashConfigFindPeerByAddress	32	static
+flash.c:319:6:flashConfigUpdatePeerName	32	static
+flash.c:334:6:flashConfigUpdatePeer	152	static
