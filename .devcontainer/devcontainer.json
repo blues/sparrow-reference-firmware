@@ -15,7 +15,8 @@
     // Add the IDs of extensions you want installed when the container is created.
     "extensions": [
         "marus25.cortex-debug",
-        "ms-vscode.cpptools"
+        "ms-vscode.cpptools",
+        "zfields.cortex-debug-dp-stm32wl"
     ],
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.

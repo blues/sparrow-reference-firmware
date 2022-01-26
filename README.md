@@ -6,7 +6,7 @@ Prerequisites
 
 ### Hardware
 
-- Sparrow Gateway (See [here](https://www.notion.so/Sparrow-sensor-1-0-Gateway-conversion-rework-10-9-21-51f3efa18a5443b5960ac711e634741e) if reworking a v1.0 sensor board as gateway)
+- Sparrow Gateway
 - Sparrow Reference Sensor
 - Notecard (preferably Note-WiFi)
 - Notecarrier
@@ -35,6 +35,7 @@ Prerequisites
 - [STM32CubeProg](https://www.st.com/en/development-tools/stm32cubeprog.html)
 - [GNU ARM toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 - [VSCode “Cortex Debug” Extension](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug)
+- [VSCode “Cortex-Debug: Device Support Pack - STM32WL” Extension](https://marketplace.visualstudio.com/items?itemName=zfields.cortex-debug-dp-stm32wl)
 
 > _**NOTE:** Be sure to add/install all tools/libraries into your system path._
 >

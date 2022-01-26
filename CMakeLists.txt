@@ -19,7 +19,7 @@ set(EXECUTABLE sparrow)
 # Create variables to alias path names
 set(SDK ${CMAKE_CURRENT_LIST_DIR}/sparrow-lora)
 set(NOTE_C ${CMAKE_CURRENT_LIST_DIR}/note-c)
-set(USER_DEFINED_SENSORS ${CMAKE_CURRENT_LIST_DIR}/user-defined-sensors)
+set(SPARROW_APPLICATION ${CMAKE_CURRENT_LIST_DIR}/sparrow-application)
 
 # Set global compile settings
 add_compile_definitions(
@@ -214,11 +214,11 @@ target_link_libraries(sparrow-runtime
 )
 
 # Pull in user-defined sensors
-if(IS_DIRECTORY ${USER_DEFINED_SENSORS})
-    if(EXISTS ${USER_DEFINED_SENSORS}/CMakeLists.txt)
-        add_subdirectory(${USER_DEFINED_SENSORS})
-        if (NOT TARGET user-defined-sensors)
-            message(WARNING "Could not find the user-defined-sensors target. No user-defined sensors will be imported")
+if(IS_DIRECTORY ${SPARROW_APPLICATION})
+    if(EXISTS ${SPARROW_APPLICATION}/CMakeLists.txt)
+        add_subdirectory(${SPARROW_APPLICATION})
+        if (NOT TARGET sparrow-application)
+            message(WARNING "Could not find the sparrow-application target. No user-defined sensors will be imported")
         endif()
     else()
         message(WARNING "Could not find CMakeList.txt. No user-defined sensors will be imported.")
@@ -240,17 +240,17 @@ target_link_libraries(${EXECUTABLE}
     PRIVATE st
 )
 
-if (TARGET user-defined-sensors)
+if (TARGET sparrow-application)
     target_sources(${EXECUTABLE}
-        PRIVATE ${USER_DEFINED_SENSORS}/register.c
+        PRIVATE ${SPARROW_APPLICATION}/init.c
     )
 
     add_dependencies(${EXECUTABLE}
-        user-defined-sensors
+        sparrow-application
     )
 
     target_link_libraries(${EXECUTABLE}
-        PRIVATE user-defined-sensors
+        PRIVATE sparrow-application
     )
 endif()
 
