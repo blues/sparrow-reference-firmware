@@ -1,7 +1,0 @@
-diag.c:52:6:diagActivate	24	static
-diag.c:62:6:diagInit	48	static
-diag.c:90:6:diagISR	16	static
-diag.c:110:6:diagPoll	40	static
-diag.c:156:6:diagResponse	32	static
-diag.c:186:13:addNote	24	static
-diag.c:217:13:registerNotefileTemplate	16	static

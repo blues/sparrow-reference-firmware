@@ -1,11 +1,11 @@
 # CMake Artifacts
 /build/
-/cmake-build-*
 
-# Debug Artifacts
+# Cortex Debug Artifacts
+/.vscode/.cortex-debug.peripherals.state.json
 /.vscode/.cortex-debug.registers.state.json
 
 # STM32CubeIDE Artifacts
-/.settings/
-/Debug/
-/Release/
+/.STM32CubeIDE/.settings/
+/.STM32CubeIDE/Debug/
+/.STM32CubeIDE/Release/

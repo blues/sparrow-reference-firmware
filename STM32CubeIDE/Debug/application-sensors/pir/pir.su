@@ -1,7 +1,0 @@
-pir.c:41:6:pirInit	112	static
-pir.c:189:6:resetInterrupt	32	static
-pir.c:213:6:pirPoll	24	static
-pir.c:252:13:registerNotefileTemplate	16	static
-pir.c:293:6:pirResponse	32	static
-pir.c:323:13:addNote	24	static
-pir.c:359:6:pirISR	16	static

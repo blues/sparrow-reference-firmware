@@ -81,9 +81,8 @@ STM32CubeIDE Instructions
 1. Open the STM32CubeIDE application.
 2. Navigate to **File > Open Projects from File System....**
 3. Press the **Directory...** button.
-4. Open the newly cloned repository.
-5. **[IMPORTANT]** Deselect the nested projects (i.e. do _NOT_ import them).
-7. Press the **Finish** button.
+4. Open the hidden folder, `.STM32CubeIDE`, from the newly cloned repository.
+5. Press the **Finish** button.
 
 ### Build Sparrow Firmware
 

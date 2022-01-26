@@ -1,3 +1,0 @@
-util.c:8:6:utilHTOA8	24	static
-util.c:26:6:utilAddressToText	32	static
-util.c:38:6:extractNameComponents	32	static

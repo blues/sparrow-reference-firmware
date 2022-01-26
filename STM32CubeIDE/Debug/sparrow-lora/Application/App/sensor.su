@@ -1,6 +1,0 @@
-sensor.c:18:6:sensorTimerEvent	16	static
-sensor.c:24:6:sensorTimerWakeFromISR	16	static
-sensor.c:34:6:sensorTimerStart	32	static
-sensor.c:87:6:sensorTimerCancel	8	static
-sensor.c:93:6:sensorPoll	8	static
-sensor.c:113:6:sensorCmd	16	static
