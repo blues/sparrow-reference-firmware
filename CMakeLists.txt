@@ -38,6 +38,7 @@ add_compile_options(
     -Wextra
     -Wpedantic
     -Wimplicit-fallthrough=2
+    -Wno-unused-parameter
     -fstack-usage
     -MMD
     -MP
@@ -71,15 +72,7 @@ target_include_directories(note-c
 
 # Compile ST platform seperately
 add_library(st OBJECT
-    ${SDK}/Application/Core/Radio/radio_board_if.c
-    ${SDK}/Application/Core/Src/debug.c
-    ${SDK}/Application/Core/Src/stm32_lpm_if.c
-    ${SDK}/Application/Core/Src/stm32wlxx_hal_msp.c
-    ${SDK}/Application/Core/Src/stm32wlxx_it.c
     ${SDK}/Application/Core/Src/system_stm32wlxx.c
-    ${SDK}/Application/Core/Src/timer_if.c
-    ${SDK}/Application/Core/Src/usart_if.c
-    ${SDK}/Application/Core/Src/util_if.c
     ${SDK}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
     ${SDK}/Application/STM32CubeIDE/sys/syscalls.c
     ${SDK}/Application/STM32CubeIDE/sys/sysmem.c
@@ -146,7 +139,7 @@ add_library(st OBJECT
 
 target_include_directories(st SYSTEM
     PRIVATE ${SDK}/Application
-    PUBLIC ${SDK}/Application/Core/Inc
+    PRIVATE ${SDK}/Application/Core/Inc
     PRIVATE ${SDK}/Application/Core/Radio
     PRIVATE ${SDK}/Drivers/CMSIS/Core/Include
     PUBLIC ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include
@@ -187,6 +180,14 @@ add_library(sparrow-runtime OBJECT
     ${SDK}/Application/App/sensor.c
     ${SDK}/Application/App/trace.c
     ${SDK}/Application/App/util.c
+    ${SDK}/Application/Core/Radio/radio_board_if.c
+    ${SDK}/Application/Core/Src/debug.c
+    ${SDK}/Application/Core/Src/stm32_lpm_if.c
+    ${SDK}/Application/Core/Src/stm32wlxx_hal_msp.c
+    ${SDK}/Application/Core/Src/stm32wlxx_it.c
+    ${SDK}/Application/Core/Src/timer_if.c
+    ${SDK}/Application/Core/Src/usart_if.c
+    ${SDK}/Application/Core/Src/util_if.c
     ${SDK}/Application/Gateway/auth.c
     ${SDK}/Application/Sensor/bme280/bme280.c
     ${SDK}/Application/Sensor/bme.c
@@ -199,6 +200,7 @@ add_library(sparrow-runtime OBJECT
 target_include_directories(sparrow-runtime
     PUBLIC ${SDK}/Application
     PUBLIC ${SDK}/Application/App
+    PUBLIC ${SDK}/Application/Core/Inc
     PUBLIC ${SDK}/Application/Sensor
     PUBLIC ${SDK}/Application/Sensor/bme280
 )

@@ -23,3 +23,7 @@ add_dependencies(sparrow-application
 target_link_libraries(sparrow-application
     PRIVATE sparrow-runtime
 )
+
+target_compile_options(sparrow-application
+    PRIVATE -Wunused-parameter
+)
