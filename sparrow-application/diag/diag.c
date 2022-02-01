@@ -1,7 +1,6 @@
-/*
- * Compile Command:
- * gcc diag.c -c -D CORE_CM4 -D STM32WL55xx -I sparrow-lora/Application/ -I sparrow-lora/Application/App/ -I sparrow-lora/Application/Sensor/ -I sparrow-lora/Application/Core/Inc/ -I sparrow-lora/Drivers/CMSIS/Device/ST/STM32WLxx/Include/ -I sparrow-lora/Drivers/CMSIS/Include/ -I sparrow-lora/Drivers/STM32WLxx_HAL_Driver/Inc/ -I sparrow-lora/note-c/ -I sparrow-lora/Utilities/misc -I sparrow-lora/Utilities/trace/adv_trace/ -I sparrow-lora/Utilities/timer/ -o diag.o
- */
+// Copyright 2022 Blues Inc.  All rights reserved.
+// Use of this source code is governed by licenses granted by the
+// copyright holder including that found in the LICENSE file.
 
 #include "diag.h"
 

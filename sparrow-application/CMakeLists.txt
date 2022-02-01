@@ -1,3 +1,7 @@
+# Copyright 2022 Blues Inc.  All rights reserved.
+# Use of this source code is governed by licenses granted by the
+# copyright holder including that found in the LICENSE file.
+
 # Target name `sparrow-application` is required for import
 add_library(sparrow-application STATIC
     ${CMAKE_CURRENT_LIST_DIR}/bme/bme.c
