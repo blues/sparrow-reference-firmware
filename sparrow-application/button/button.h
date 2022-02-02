@@ -12,6 +12,6 @@
 #include <note.h>
 
 bool buttonInit(void);
-void buttonISR(int sensorID, uint16_t pins);
-void buttonPoll(int sensorID, int state);
-void buttonResponse(int sensorID, J *rsp);
+void buttonISR(int appID, uint16_t pins);
+void buttonPoll(int appID, int state);
+void buttonResponse(int appID, J *rsp);

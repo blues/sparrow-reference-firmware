@@ -5,28 +5,28 @@
 #include "ping.h"
 
 // Sparrow Header(s)
-#include <sensor.h>
+#include <framework.h>
 
 // States for the local state machine
-#define STATE_BUTTON                0
+#define STATE_BUTTON          0
 
 // Special request IDs
-#define REQUESTID_MANUAL_PING       1
-#define REQUESTID_TEMPLATE          2
+#define REQUESTID_MANUAL_PING 1
+#define REQUESTID_TEMPLATE    2
 
 // The filename of the test database.  Note that * is replaced by the
-// gateway with the sensor's ID, while the # is a special character
-// reserved by the notecard and notehub for a Sensor ID that is
+// gateway with the Sparrow node's ID, while the # is a special character
+// reserved by the Notecard and Notehub for a Scheduled App ID that is
 // appended to the device ID within Events.
-#define SENSORDATA_NOTEFILE         "*#data.qo"
+#define APPLICATION_NOTEFILE  "*#data.qo"
 
 // TRUE if we've successfully registered the template
 #if !SURVEY_MODE
 static bool templateRegistered = false;
 #endif
 
-// Our sensor ID
-static int sensorID = -1;
+// Our scheduled app's ID
+static int appID = -1;
 
 // Forwards
 static bool sendHealthLogMessage(bool immediate);
@@ -35,12 +35,12 @@ static void addNote(uint32_t count);
 static bool registerNotefileTemplate(void);
 #endif
 
-// Sensor One-Time Init
+// Scheduled App One-Time Init
 bool pingInit()
 {
 
-    // Register the sensor
-    sensorConfig config = {
+    // Register the app
+    schedAppConfig config = {
         .name = "ping",
         .activationPeriodSecs = 60 * 15,
         .pollIntervalSecs = 15,
@@ -49,8 +49,8 @@ bool pingInit()
         .pollFn = pingPoll,
         .responseFn = pingResponse,
     };
-    sensorID = schedRegisterSensor(&config);
-    if (sensorID < 0) {
+    appID = schedRegisterApp(&config);
+    if (appID < 0) {
         return false;
     }
 
@@ -60,20 +60,19 @@ bool pingInit()
 }
 
 // Poller
-void pingPoll(int sensorID, int state)
+void pingPoll(int appID, int state)
 {
 
     // Switch based upon state
     switch (state) {
 
-    // Sensor was just activated, so simulate the
-    // sensor sampling something and adding a note
-    // to the notefile.
+    // Application was just activated, so simulate
+    // sampling data and adding a Note to the Notefile.
     case STATE_ACTIVATED:
 
 #if SURVEY_MODE
 
-        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
         break;
 
 #else
@@ -81,7 +80,7 @@ void pingPoll(int sensorID, int state)
         // If the template isn't registered, do so
         if (!templateRegistered) {
             registerNotefileTemplate();
-            schedSetCompletionState(sensorID, STATE_ACTIVATED, STATE_DEACTIVATED);
+            schedSetCompletionState(appID, STATE_ACTIVATED, STATE_DEACTIVATED);
             APP_PRINTF("ping: template registration request\r\n");
             break;
         }
@@ -89,7 +88,7 @@ void pingPoll(int sensorID, int state)
         // Add a note to the file
         static int notecount = 0;
         addNote(++notecount);
-        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
         APP_PRINTF("ping: note queued\r\n");
         break;
 
@@ -105,7 +104,7 @@ void pingPoll(int sensorID, int state)
         atpMaximizePowerLevel();
         ledIndicateAck(1);
         sendHealthLogMessage(true);
-        schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
         APP_PRINTF("ping: sent health update\r\n");
         break;
 
@@ -114,12 +113,12 @@ void pingPoll(int sensorID, int state)
 }
 
 // Interrupt handler
-void pingISR(int sensorID, uint16_t pins)
+void pingISR(int appID, uint16_t pins)
 {
 
     // Set the state to button, and immediately schedule
     if ((pins & BUTTON1_Pin) != 0) {
-        schedActivateNowFromISR(sensorID, true, STATE_BUTTON);
+        schedActivateNowFromISR(appID, true, STATE_BUTTON);
         return;
     }
 
@@ -151,9 +150,9 @@ bool sendHealthLogMessage(bool immediate)
     // Format the health message
     char message[80];
     utilAddressToText(ourAddress, message, sizeof(message));
-    if (sensorName[0] != '\0') {
+    if (schedAppName(appID)[0] != '\0') {
         strlcat(message, " (", sizeof(message));
-        strlcat(message, sensorName, sizeof(message));
+        strlcat(message, schedAppName(appID), sizeof(message));
         strlcat(message, ")", sizeof(message));
     }
     strlcat(message, " says hello", sizeof(message));
@@ -214,12 +213,12 @@ static bool registerNotefileTemplate()
     // the size of the over-the-air JSON we're using a special format
     // for the "file" parameter implemented by the gateway, in which
     // a "file" parameter beginning with * will have that character
-    // substituted with the textified sensor address.
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    // substituted with the textified application address.
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body template
     JAddNumberToObject(body, "count", TINT32);
-    JAddStringToObject(body, "sensor", TSTRING(40));
+    JAddStringToObject(body, "app", TSTRING(40));
 
     // Attach the body to the request, and send it to the gateway
     JAddItemToObject(req, "body", body);
@@ -248,12 +247,12 @@ static void addNote(uint32_t count)
     }
 
     // Set the target notefile
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body
     JAddNumberToObject(body, "count", count);
-    if (sensorName[0] != '\0') {
-        JAddStringToObject(body, "sensor", sensorName);
+    if (schedAppName(appID)[0] != '\0') {
+        JAddStringToObject(body, "app", schedAppName(appID));
     }
 
     // Attach the body to the request, and send it to the gateway
@@ -264,10 +263,10 @@ static void addNote(uint32_t count)
 #endif
 
 // Gateway Response handler
-void pingResponse(int sensorID, J *rsp)
+void pingResponse(int appID, J *rsp)
 {
     // Unused parameter(s)
-    (void)sensorID;
+    (void)appID;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -278,7 +277,7 @@ void pingResponse(int sensorID, J *rsp)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("sensor error response: %d\r\n", err);
+        APP_PRINTF("ping: app error response: %d\r\n", err);
         return;
     }
 

@@ -3,11 +3,13 @@
 // copyright holder including that found in the LICENSE file.
 
 // Sparrow Header(s)
-#include <sensor.h>
+#include <framework.h>
 
-// Sensor Header(s)
+// Scheduled App Header(s)
 #include "diag/diag.h"
 
-void initSensors (void) {
-    diagInit();
+void schedAppInit (void) {
+    if (diagInit()) {
+        APP_PRINTF("ERROR: Failed to initialize diagnostic application!\r\n");
+    }
 }

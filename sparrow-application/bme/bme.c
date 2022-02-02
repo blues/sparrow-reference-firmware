@@ -8,7 +8,7 @@
 #include <math.h>
 
 // Sparrow Header(s)
-#include <sensor.h>
+#include <framework.h>
 
 // ST Header(s)
 #include <main.h>
@@ -19,10 +19,10 @@
 #define REQUESTID_TEMPLATE          1
 
 // The filename of the test database.  Note that * is replaced by the
-// gateway with the sensor's ID, while the # is a special character
-// reserved by the notecard and notehub for a Sensor ID that is
+// gateway with the Sparrow node's ID, while the # is a special character
+// reserved by the Notecard and Notehub for a Scheduled App ID that is
 // appended to the device ID within Events.
-#define SENSORDATA_NOTEFILE         "*#air.qo"
+#define APPLICATION_NOTEFILE "*#air.qo"
 
 // TRUE if we've successfully registered the template
 static bool templateRegistered = false;
@@ -45,8 +45,8 @@ static uint8_t bme_dev_addr = 0;
 // Whether or not the next note should sync
 static bool syncNow = false;
 
-// Our sensor ID
-static int sensorID = -1;
+// Our scheduled app's ID
+static int appID = -1;
 
 // Forwards
 static bool bme280_read(struct bme280_dev *dev, struct bme280_data *comp_data);
@@ -57,12 +57,12 @@ static bool addNote(void);
 static bool registerNotefileTemplate(void);
 static bool bmeUpdate(void);
 
-// Sensor One-Time Init
+// Scheduled App One-Time Init
 bool bmeInit()
 {
 
-    // Register the sensor
-    sensorConfig config = {
+    // Register the app
+    schedAppConfig config = {
         .name = "bme",
         .activationPeriodSecs = 60 * 60,
         .pollIntervalSecs = 15,
@@ -71,8 +71,8 @@ bool bmeInit()
         .pollFn = bmePoll,
         .responseFn = bmeResponse,
     };
-    sensorID = schedRegisterSensor(&config);
-    if (sensorID < 0) {
+    appID = schedRegisterApp(&config);
+    if (appID < 0) {
         return false;
     }
 
@@ -98,12 +98,12 @@ bool bmeInit()
 }
 
 // Poller
-void bmePoll(int sensorID, int state)
+void bmePoll(int appID, int state)
 {
 
-    // Disable if this isn't a reference sensor
+    // Disable if this isn't a Sparrow reference board
     if (appSKU() != SKU_REFERENCE) {
-        schedDisable(sensorID);
+        schedDisable(appID);
         return;
     }
 
@@ -113,14 +113,14 @@ void bmePoll(int sensorID, int state)
     case STATE_ACTIVATED:
         if (!templateRegistered) {
             registerNotefileTemplate();
-            schedSetCompletionState(sensorID, STATE_ACTIVATED, STATE_DEACTIVATED);
+            schedSetCompletionState(appID, STATE_ACTIVATED, STATE_DEACTIVATED);
             APP_PRINTF("bme: template registration request\r\n");
             break;
         }
         if (!addNote()) {
-            schedSetState(sensorID, STATE_DEACTIVATED, "bme: update failure");
+            schedSetState(appID, STATE_DEACTIVATED, "bme: update failure");
         } else {
-            schedSetCompletionState(sensorID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+            schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
             APP_PRINTF("bme: note queued\r\n");
         }
         break;
@@ -156,8 +156,8 @@ static bool registerNotefileTemplate()
     // the size of the over-the-air JSON we're using a special format
     // for the "file" parameter implemented by the gateway, in which
     // a "file" parameter beginning with * will have that character
-    // substituted with the textified sensor address.
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    // substituted with the textified application address.
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body template
     JAddNumberToObject(body, "temperature", TFLOAT16);
@@ -173,10 +173,10 @@ static bool registerNotefileTemplate()
 }
 
 // Gateway Response handler
-void bmeResponse(int sensorID, J *rsp)
+void bmeResponse(int appID, J *rsp)
 {
     // Unused parameter(s)
-    (void)sensorID;
+    (void)appID;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -187,7 +187,7 @@ void bmeResponse(int sensorID, J *rsp)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("sensor error response: %d\r\n", err);
+        APP_PRINTF("bme: app error response: %d\r\n", err);
         return;
     }
 
@@ -231,7 +231,7 @@ static bool addNote()
     }
 
     // Set the target notefile
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // If immediate, sync now
     if (syncNow) {

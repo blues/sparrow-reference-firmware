@@ -5,29 +5,29 @@
 #include "diag.h"
 
 // Sparrow Header(s)
-#include <sensor.h>
+#include <framework.h>
 
 // ST Header(s)
 #include <main.h>  // ST system function declarations
 
 // States for the local state machine
-#define STATE_DIAG_CHECK            0
-#define STATE_DIAG_ISR_XFER         1
+#define STATE_DIAG_CHECK       0
+#define STATE_DIAG_ISR_XFER    1
 
 // Special request IDs
-#define REQUESTID_TEMPLATE          2
+#define REQUESTID_TEMPLATE     2
 
-#define ISR_MAX_CALL_RETENTION      8
-#define ISR_COUNTER_MASK            ~0xFFFFFFF8
+#define ISR_MAX_CALL_RETENTION 8
+#define ISR_COUNTER_MASK       ~0xFFFFFFF8
 
 // The filename of the test database.  Note that * is replaced by the
-// gateway with the sensor's ID, while the # is a special character
-// reserved by the notecard and notehub for a Sensor ID that is
+// gateway with the Sparrow node's ID, while the # is a special character
+// reserved by the Notecard and Notehub for a Scheduled App ID that is
 // appended to the device ID within Events.
-#define SENSORDATA_NOTEFILE         "*#diag.qo"
+#define APPLICATION_NOTEFILE   "*#diag.qo"
 
 typedef struct ISR_parameters {
-    int sensorID;
+    int appID;
     uint16_t pins;
 } ISR_parameters;
 
@@ -44,27 +44,27 @@ static bool done = false;
 static void addNote(bool immediate);
 static bool registerNotefileTemplate(void);
 
-// Our sensor ID
-static int sensorID = -1;
+// Our scheduled app's ID
+static int appID = -1;
 
-// Sensor Activation (on wake)
-bool diagActivate(int sensorID)
+// Application Activation (on wake)
+bool diagActivate(int appID)
 {
-    APP_PRINTF("diag: Entered sensor callback function: diagActivate\r\n\tsensorId: %d\r\n", sensorID);
+    APP_PRINTF("diag: Entered application callback function: diagActivate\r\n\tappId: %d\r\n", appID);
     done = false;
 
     // Success
     return true;
 }
 
-// Sensor One-Time Init
+// Scheduled App One-Time Init
 bool diagInit(void)
 {
-    APP_PRINTF("diag: Entered sensor callback function: diagInit\r\n");
+    APP_PRINTF("diag: Initializing application...\r\n");
     bool result = false;
 
-    // Register the sensor
-    sensorConfig config = {
+    // Register the application
+    schedAppConfig config = {
         .name = "diagnostic",
         .activationPeriodSecs = 60 * 5,
         .pollIntervalSecs = 5,
@@ -73,8 +73,8 @@ bool diagInit(void)
         .pollFn = diagPoll,
         .responseFn = diagResponse,
     };
-    sensorID = schedRegisterSensor(&config);
-    if (sensorID < 0) {
+    appID = schedRegisterApp(&config);
+    if (appID < 0) {
         // Failure
         result = false;
     } else {
@@ -86,50 +86,45 @@ bool diagInit(void)
 }
 
 // Interrupt handler
-void diagISR(int sensorID, uint16_t pins)
+void diagISR(int appID, uint16_t pins)
 {
     /*
      * This callback function is executed directly from the ISR.
      * Only perform ISR sensitive operations and exit quickly.
      */
-    isr_params[isr_count].sensorID = sensorID;
+    isr_params[isr_count].appID = appID;
     isr_params[isr_count].pins = pins;
     ++isr_count;
     isr_count = (ISR_COUNTER_MASK & isr_count);
     isr_overflow = (isr_overflow || !isr_count);
 
-	if (!schedIsActive(sensorID) && (pins & BUTTON1_Pin)) {
-        schedActivateNowFromISR(sensorID, true, STATE_DIAG_ISR_XFER);
+	if (!schedIsActive(appID) && (pins & BUTTON1_Pin)) {
+        schedActivateNowFromISR(appID, true, STATE_DIAG_ISR_XFER);
     }
-
-	return;
 }
 
 // Poller
-void diagPoll(int sensorID, int state)
+void diagPoll(int appID, int state)
 {
-    APP_PRINTF("diag: Entered sensor callback function: diagPoll\r\n\tsensorId: %d\tstate: %s\r\n", sensorID, schedStateName(state));
-//    if (appSKU() != SKU_REFERENCE) {
-//    	schedDisable(sensorID);
-//    }
+    APP_PRINTF("diag: Entered application callback function: diagPoll\r\n\tappId: %d\tstate: %s\r\n", appID, schedStateName(state));
 
     // Switch based upon state
     switch (state) {
     case STATE_ACTIVATED:
         if (!templateRegistered) {
             registerNotefileTemplate();
-            schedSetCompletionState(sensorID, STATE_DIAG_CHECK, STATE_ACTIVATED);
+            schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_ACTIVATED);
             APP_PRINTF("diag: template registration request\r\n");
         } else {
-            schedSetState(sensorID, STATE_DIAG_CHECK, "diag: process diagnostics");
+            schedSetState(appID, STATE_DIAG_CHECK, "diag: process diagnostics");
         }
         break;
 
     case STATE_DIAG_ISR_XFER:
-        APP_PRINTF("diag: Transfered from sensor ISR callback function.\r\n");
+        APP_PRINTF("diag: Transfered from application ISR callback function.\r\n");
         APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (isr_overflow ? "more than" : ""), (isr_overflow ? ISR_MAX_CALL_RETENTION : isr_count));
         for (size_t i = 0 ; i < isr_count ; ++i) {
-            APP_PRINTF("diag: call %d:\tsensorId: %d\tpins: %d\r\n", i, isr_params[i].sensorID, isr_params[i].pins);
+            APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, isr_params[i].appID, isr_params[i].pins);
         }
         isr_count = 0;
         isr_overflow = false; // fall through
@@ -137,12 +132,12 @@ void diagPoll(int sensorID, int state)
 
     case STATE_DIAG_CHECK:
         if (done) {
-            schedSetState(sensorID, STATE_DEACTIVATED, "diag: completed");
+            schedSetState(appID, STATE_DEACTIVATED, "diag: completed");
             break;
         }
         APP_PRINTF("diag: generating diagnostic report\r\n");
         addNote(true);
-        schedSetCompletionState(sensorID, STATE_DIAG_CHECK, STATE_DIAG_CHECK);
+        schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_CHECK);
         APP_PRINTF("diag: note queued\r\n");
         done = true;
         break;
@@ -152,9 +147,9 @@ void diagPoll(int sensorID, int state)
 }
 
 // Gateway Response handler
-void diagResponse(int sensorID, J *rsp)
+void diagResponse(int appID, J *rsp)
 {
-    APP_PRINTF("diag: Entered sensor callback function: diagResponse\r\n\tsensorId: %d\trsp: %s\r\n", sensorID, JConvertToJSONString(rsp));
+    APP_PRINTF("diag: Entered application callback function: diagResponse\r\n\tappId: %d\trsp: %s\r\n", appID, JConvertToJSONString(rsp));
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -165,7 +160,7 @@ void diagResponse(int sensorID, J *rsp)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("sensor error response: %d\r\n", err);
+        APP_PRINTF("diag: app error response: %d\r\n", err);
         return;
     }
 
@@ -181,7 +176,7 @@ void diagResponse(int sensorID, J *rsp)
     }
 }
 
-// Send the sensor data
+// Send the application data
 static void addNote(bool immediate)
 {
     // Create the request
@@ -203,7 +198,7 @@ static void addNote(bool immediate)
     }
 
     // Set the target notefile
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body
     JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
@@ -238,8 +233,8 @@ static bool registerNotefileTemplate()
     // the size of the over-the-air JSON we're using a special format
     // for the "file" parameter implemented by the gateway, in which
     // a "file" parameter beginning with * will have that character
-    // substituted with the textified sensor address.
-    JAddStringToObject(req, "file", SENSORDATA_NOTEFILE);
+    // substituted with the textified Sparrow node address.
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body template
     JAddNumberToObject(body, "mem.heap.bytes", TINT32);

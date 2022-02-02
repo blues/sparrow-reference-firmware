@@ -169,21 +169,6 @@ target_compile_options(st
 
 # Compile Sparrow Runtime
 add_library(sparrow-runtime OBJECT
-    ${SDK}/Application/App/app.c
-    ${SDK}/Application/App/appinit.c
-    ${SDK}/Application/App/atp.c
-    ${SDK}/Application/App/dfu.c
-    ${SDK}/Application/App/dfuload.c
-    ${SDK}/Application/App/flash.c
-    ${SDK}/Application/App/gateway.c
-    ${SDK}/Application/App/led.c
-    ${SDK}/Application/App/note.c
-    ${SDK}/Application/App/post.c
-    ${SDK}/Application/App/radioinit.c
-    ${SDK}/Application/App/sched.c
-    ${SDK}/Application/App/sensor.c
-    ${SDK}/Application/App/trace.c
-    ${SDK}/Application/App/util.c
     ${SDK}/Application/Core/Radio/radio_board_if.c
     ${SDK}/Application/Core/Src/debug.c
     ${SDK}/Application/Core/Src/stm32_lpm_if.c
@@ -192,6 +177,21 @@ add_library(sparrow-runtime OBJECT
     ${SDK}/Application/Core/Src/timer_if.c
     ${SDK}/Application/Core/Src/usart_if.c
     ${SDK}/Application/Core/Src/util_if.c
+    ${SDK}/Application/Framework/app.c
+    ${SDK}/Application/Framework/appinit.c
+    ${SDK}/Application/Framework/atp.c
+    ${SDK}/Application/Framework/dfu.c
+    ${SDK}/Application/Framework/dfuload.c
+    ${SDK}/Application/Framework/flash.c
+    ${SDK}/Application/Framework/gateway.c
+    ${SDK}/Application/Framework/led.c
+    ${SDK}/Application/Framework/note.c
+    ${SDK}/Application/Framework/post.c
+    ${SDK}/Application/Framework/radioinit.c
+    ${SDK}/Application/Framework/sched.c
+    ${SDK}/Application/Framework/sensor.c
+    ${SDK}/Application/Framework/trace.c
+    ${SDK}/Application/Framework/util.c
     ${SDK}/Application/Gateway/auth.c
     ${SDK}/Application/Sensor/bme280/bme280.c
     ${SDK}/Application/Sensor/bme.c
@@ -203,8 +203,8 @@ add_library(sparrow-runtime OBJECT
 
 target_include_directories(sparrow-runtime
     PUBLIC ${SDK}/Application
-    PUBLIC ${SDK}/Application/App
     PUBLIC ${SDK}/Application/Core/Inc
+    PUBLIC ${SDK}/Application/Framework
     PUBLIC ${SDK}/Application/Sensor
     PUBLIC ${SDK}/Application/Sensor/bme280
 )

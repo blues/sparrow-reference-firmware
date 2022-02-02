@@ -134,6 +134,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/sparrow-application/pir</locationURI>
 		</link>
 		<link>
+			<name>sparrow-lora/Application/Framework</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/Framework</locationURI>
+		</link>
+		<link>
 			<name>sparrow-lora/Utilities/stm32_adv_trace.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Utilities/trace/adv_trace/stm32_adv_trace.c</locationURI>
@@ -167,81 +172,6 @@
 			<name>sparrow-lora/Utilities/stm32_tiny_vsnprintf.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Utilities/misc/stm32_tiny_vsnprintf.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/app.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/app.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/appinit.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/appinit.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/atp.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/atp.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/dfu.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/dfu.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/dfuload.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/dfuload.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/flash.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/flash.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/gateway.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/gateway.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/led.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/led.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/note.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/note.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/post.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/post.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/radioinit.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/radioinit.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/sched.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/sched.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/sensor.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/sensor.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/trace.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/trace.c</locationURI>
-		</link>
-		<link>
-			<name>sparrow-lora/Application/App/util.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/sparrow-lora/Application/App/util.c</locationURI>
 		</link>
 		<link>
 			<name>sparrow-lora/Application/Core/debug.c</name>

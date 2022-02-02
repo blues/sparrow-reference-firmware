@@ -12,6 +12,6 @@
 #include <note.h>
 
 bool pirInit(void);
-void pirISR(int sensorID, uint16_t pins);
-void pirPoll(int sensorID, int state);
-void pirResponse(int sensorID, J *rsp);
+void pirISR(int appID, uint16_t pins);
+void pirPoll(int appID, int state);
+void pirResponse(int appID, J *rsp);
