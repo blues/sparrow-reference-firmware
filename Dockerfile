@@ -51,15 +51,15 @@ RUN ["dash", "-c", "\
 WORKDIR /root
 
 # Download/Install ARM Cross Compiler
-RUN ["dash", "-c", "\
-    curl -SLO# https://developer.arm.com/-/media/Files/downloads/gnu-rm/${GCC_ARM_VERSION}/gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
- && md5sum gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
- && echo \"${GCC_ARM_CHECKSUM} gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2\" | md5sum -c - \
- && tar -xjf gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 -C /opt \
- && mv /opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/ /opt/gcc-arm \
- && rm -rf gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
-"]
-ENV PATH="/opt/gcc-arm/bin:${PATH}"
+# RUN ["dash", "-c", "\
+#     curl -SLO# https://developer.arm.com/-/media/Files/downloads/gnu-rm/${GCC_ARM_VERSION}/gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
+#  && md5sum gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
+#  && echo \"${GCC_ARM_CHECKSUM} gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2\" | md5sum -c - \
+#  && tar -xjf gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 -C /opt \
+#  && mv /opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/ /opt/gcc-arm \
+#  && rm -rf gcc-arm-none-eabi-${GCC_ARM_VERSION}-x86_64-linux.tar.bz2 \
+# "]
+# ENV PATH="/opt/gcc-arm/bin:${PATH}"
 
 # Download/Install STM32CubeProg Utilities
 RUN ["dash", "-c", "\
@@ -82,8 +82,9 @@ RUN ["dash", "-c", "\
  && yes | LICENSE_ALREADY_ACCEPTED=1 STM32CubeIDE-1.8.0/st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh \
  && rm -rf en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip STM32CubeIDE-1.8.0/ \
 "]
-ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin/:${PATH}
-ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin/native/linux_x64/:${LD_LIBRARY_PATH}
+ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/bin:${PATH}
+ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
 
 # Add `udev` Rules for STMicroelectronics
 RUN ["dash", "-c", "\

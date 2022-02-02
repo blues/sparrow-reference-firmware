@@ -1,0 +1,48 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}"
+        ]
+    },
+    "configurations": [
+        {
+            "name": "ARM",
+            "intelliSenseMode": "gcc-arm",
+            "includePath": [
+                "${myDefaultIncludePath}",
+                "/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/arm-none-eabi/include",
+                "${workspaceFolder}/sparrow-lora/Application",
+                "${workspaceFolder}/sparrow-lora/Application/Core/Inc",
+                "${workspaceFolder}/sparrow-lora/Application/Core/Radio",
+                "${workspaceFolder}/sparrow-lora/Drivers/CMSIS/Core/Include",
+                "${workspaceFolder}/sparrow-lora/Drivers/CMSIS/Device/ST/STM32WLxx/Include",
+                "${workspaceFolder}/sparrow-lora/Drivers/CMSIS/DSP/Include",
+                "${workspaceFolder}/sparrow-lora/Drivers/CMSIS/Include",
+                "${workspaceFolder}/sparrow-lora/Drivers/STM32WLxx_HAL_Driver/Inc",
+                "${workspaceFolder}/sparrow-lora/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/sparrow-lora/Middlewares/Third_Party/SubGHz_Phy",
+                "${workspaceFolder}/sparrow-lora/Middlewares/Third_Party/SubGHz_Phy/Conf",
+                "${workspaceFolder}/sparrow-lora/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver",
+                "${workspaceFolder}/sparrow-lora/Utilities/lpm/tiny_lpm",
+                "${workspaceFolder}/sparrow-lora/Utilities/misc",
+                "${workspaceFolder}/sparrow-lora/Utilities/sequencer",
+                "${workspaceFolder}/sparrow-lora/Utilities/timer",
+                "${workspaceFolder}/sparrow-lora/Utilities/trace/adv_trace"
+            ],
+            "defines": [
+                "STM32WL55xx",
+                "CORE_CM4"
+            ],
+            "compilerPath": "/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}
