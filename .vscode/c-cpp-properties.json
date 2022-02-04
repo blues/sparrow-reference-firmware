@@ -30,6 +30,7 @@
                 "${workspaceFolder}/sparrow-lora/Utilities/trace/adv_trace"
             ],
             "defines": [
+                "CMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-gcc-toolchain.cmake",
                 "STM32WL55xx",
                 "CORE_CM4"
             ],
