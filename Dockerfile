@@ -70,7 +70,7 @@ RUN ["dash", "-c", "\
  && printf \"1\\n1\\n1\\n\\nO\\n1\\nY\\nN\\nN\\n1\\nN\\nN\\n\" | STM32CubeProgrammer-2.9.0/SetupSTM32CubeProgrammer-2.9.0.linux \
  && rm -rf en.stm32cubeprg-lin_v2-9-0.zip STM32CubeProgrammer-2.9.0/ \
 "]
-ENV PATH=/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.100.202110141430/tools/bin:${PATH}
 
 # Download/Install STM32CubeIDE (ST-LINK GDB Server)
 RUN ["dash", "-c", "\
