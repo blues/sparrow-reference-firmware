@@ -4,11 +4,14 @@
 
 #include "diag.h"
 
-// Sparrow Header(s)
-#include <framework.h>
+// Standard Library
+#include <malloc.h>
 
 // ST Header(s)
 #include <main.h>  // ST system function declarations
+
+// Sparrow Header(s)
+#include <framework.h>
 
 // States for the local state machine
 #define STATE_DIAG_CHECK       0
@@ -24,7 +27,7 @@
 // gateway with the Sparrow node's ID, while the # is a special character
 // reserved by the Notecard and Notehub for a Scheduled App ID that is
 // appended to the device ID within Events.
-#define APPLICATION_NOTEFILE "*#" __FILENAME__ ".qo"
+#define APPLICATION_NOTEFILE "*#diag.qo"
 
 typedef struct ISR_parameters {
     int appID;
@@ -149,7 +152,10 @@ void diagPoll(int appID, int state)
 // Gateway Response handler
 void diagResponse(int appID, J *rsp)
 {
-    APP_PRINTF("diag: Entered application callback function: diagResponse\r\n\tappId: %d\trsp: %s\r\n", appID, JConvertToJSONString(rsp));
+    APP_PRINTF("diag: Entered application callback function: diagResponse\r\n\tappId: %d", appID);
+    char *json_string = JConvertToJSONString(rsp);
+    APP_PRINTF("\trsp: %s\r\n", json_string);
+    free(json_string);
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -172,7 +178,7 @@ void diagResponse(int appID, J *rsp)
         APP_PRINTF("diag: SUCCESSFUL template registration\r\n");
         break;
     default:
-        ;
+        APP_PRINTF("diag: SUCCESSFUL Note submission\r\n");
     }
 }
 
@@ -201,11 +207,15 @@ static void addNote(bool immediate)
     JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body
+    struct mallinfo mem_info = mallinfo();
+
+    JAddNumberToObject(body, "mem.alloc.bytes", (JNUMBER)mem_info.uordblks);
+    JAddNumberToObject(body, "mem.free.bytes", (JNUMBER)mem_info.fordblks);
     JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
     JAddNumberToObject(body, "voltage", (JNUMBER)MX_ADC_A0_Voltage());
 
     // Send request to the gateway
-    noteSendToGatewayAsync(req, false);
+    noteSendToGatewayAsync(req, true);
 }
 
 // Register the notefile template for our data
@@ -238,7 +248,10 @@ static bool registerNotefileTemplate()
     JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Fill-in the body template
+    JAddNumberToObject(body, "mem.alloc.bytes", TINT32);
+    JAddNumberToObject(body, "mem.free.bytes", TINT32);
     JAddNumberToObject(body, "mem.heap.bytes", TINT32);
+    JAddNumberToObject(body, "voltage", TFLOAT32);
 
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);

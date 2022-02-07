@@ -193,20 +193,20 @@ add_library(sparrow-runtime OBJECT
     ${SDK}/Application/Framework/trace.c
     ${SDK}/Application/Framework/util.c
     ${SDK}/Application/Gateway/auth.c
-    ${SDK}/Application/Sensor/bme280/bme280.c
-    ${SDK}/Application/Sensor/bme.c
-    ${SDK}/Application/Sensor/button.c
-    ${SDK}/Application/Sensor/init.c
-    ${SDK}/Application/Sensor/ping.c
-    ${SDK}/Application/Sensor/pir.c
+    # ${SDK}/Application/Sensor/bme280/bme280.c
+    # ${SDK}/Application/Sensor/bme.c
+    # ${SDK}/Application/Sensor/button.c
+    # ${SDK}/Application/Sensor/init.c
+    # ${SDK}/Application/Sensor/ping.c
+    # ${SDK}/Application/Sensor/pir.c
 )
 
 target_include_directories(sparrow-runtime
     PUBLIC ${SDK}/Application
     PUBLIC ${SDK}/Application/Core/Inc
     PUBLIC ${SDK}/Application/Framework
-    PUBLIC ${SDK}/Application/Sensor
-    PUBLIC ${SDK}/Application/Sensor/bme280
+    # PUBLIC ${SDK}/Application/Sensor
+    # PUBLIC ${SDK}/Application/Sensor/bme280
 )
 
 add_dependencies(sparrow-runtime
