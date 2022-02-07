@@ -16,6 +16,7 @@
     "extensions": [
         "marus25.cortex-debug",
         "ms-vscode.cpptools",
+        "twxs.cmake",
         "zfields.cortex-debug-dp-stm32wl"
     ],
 

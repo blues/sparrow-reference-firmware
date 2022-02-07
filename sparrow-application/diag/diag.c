@@ -24,7 +24,7 @@
 // gateway with the Sparrow node's ID, while the # is a special character
 // reserved by the Notecard and Notehub for a Scheduled App ID that is
 // appended to the device ID within Events.
-#define APPLICATION_NOTEFILE   "*#diag.qo"
+#define APPLICATION_NOTEFILE "*#" __FILENAME__ ".qo"
 
 typedef struct ISR_parameters {
     int appID;
