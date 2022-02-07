@@ -202,6 +202,7 @@ static void addNote(bool immediate)
 
     // Fill-in the body
     JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
+    JAddNumberToObject(body, "voltage", (JNUMBER)MX_ADC_A0_Voltage());
 
     // Send request to the gateway
     noteSendToGatewayAsync(req, false);
