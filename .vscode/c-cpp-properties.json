@@ -8,6 +8,13 @@
         {
             "name": "ARM",
             "intelliSenseMode": "gcc-arm",
+            // The non-CMAKE defines in the this list only aid Intellesense, and do not influence the compiler.
+            // You must update defines intended for the compiler in the appropriate `CMakeLists.txt` file.
+            "defines": [
+                "CMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-gcc-toolchain.cmake",
+                "CORE_CM4",
+                "STM32WL55xx"
+            ],
             "includePath": [
                 "${myDefaultIncludePath}",
                 "/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/arm-none-eabi/include",
@@ -28,11 +35,6 @@
                 "${workspaceFolder}/sparrow-lora/Utilities/sequencer",
                 "${workspaceFolder}/sparrow-lora/Utilities/timer",
                 "${workspaceFolder}/sparrow-lora/Utilities/trace/adv_trace"
-            ],
-            "defines": [
-                "CMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-gcc-toolchain.cmake",
-                "STM32WL55xx",
-                "CORE_CM4"
             ],
             "compilerPath": "/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/bin/arm-none-eabi-gcc",
             "cStandard": "c11",
