@@ -70,7 +70,7 @@ bool diagInit(void)
     schedAppConfig config = {
         .name = "diagnostic",
         .activationPeriodSecs = 60 * 5,
-        .pollIntervalSecs = 5,
+        .pollPeriodSecs = 5,
         .activateFn = diagActivate,
         .interruptFn = diagISR,
         .pollFn = diagPoll,
