@@ -1,101 +1,17 @@
 Sparrow Accelerator Sensor Firmware
 ===================================
 
-Prerequisites
--------------
+Quickstart Guide
+----------------
 
-### Hardware
+For absolute minimal instructions for setting up your hardware, please review the following [document: Sparrow Quickstart Guide](https://www.notion.so/blueswireless/Sparrow-Quickstart-Guide-6cc63afbed744b59b03c635c2027f95c)
 
-- Sparrow Gateway
-- Sparrow Reference Sensor
-- Notecard (preferably Note-WiFi)
-- Notecarrier
-- STLINK-V3MINI
-- FTDI Cable
-- (2x) AAA batteries
+Setup and Run Guide
+-------------------
 
-### Software
+For instructions on how to setup your hardware, please review the following [document: Sparrow Setup and Run Guide](https://www.notion.so/blueswireless/Sparrow-Setup-and-Run-Guide-302725d84d9642b9b274e087881134a8)
 
-- Recursively clone the [Sparrow Accelerator Sensor Firmware](https://github.com/blues/sparrow-accelerator-sensor-firmware) repository.
+Writing Applications
+--------------------
 
-  ```
-  git clone https://github.com/blues/sparrow-accelerator-sensor-firmware.git --recursive
-  ```
-
-**Containerized Development Environment (Linux Only)**
-
-- [Docker](https://docs.docker.com/engine/install/).
-- [VSCode “Remote - Containers” Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-
-**Native Installation**
-
-- CMake (must be v3.14 or greater)
-- Make
-- [ST-LINK GDB Server (via STMCubeIDE)](https://www.st.com/en/development-tools/stm32cubeide.html)
-- [STM32CubeProg](https://www.st.com/en/development-tools/stm32cubeprog.html)
-- [GNU ARM toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-- [VSCode “Cortex Debug” Extension](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug)
-- [VSCode “Cortex-Debug: Device Support Pack - STM32WL” Extension](https://marketplace.visualstudio.com/items?itemName=zfields.cortex-debug-dp-stm32wl)
-
-> _**NOTE:** Be sure to add/install all tools/libraries into your system path._
->
-> _This may be necessary of all tools, but is especially important for `ST-LINK_gdbserver` and it’s shared library dependency, `libSTLinkUSBDriver.so` (or platform specific equivalent)._
-
-VSCode Instructions
-------------------
-
-### Utilizing the Containerized Development Environment (Linux Only)
-
-> _**NOTE:** Be sure to attach your Sparrow device to your machine before you launch the development environment, so `/dev/bus/usb` can be captured by the container._
-
-1. Once you have installed the “Remote - Containers” VSCode extension, then you can click the small green box in the lower-left corner of the VSCode window.
-2. Then select “Reopen in Container” from the dropdown menu.
-
-### Build Sparrow Firmware
-
-Hotkey: `Ctrl+Shift+B`
-
-Navigate to, **Terminal > Run Build Task...**
-
-**OR**
-
-1. Navigate to, **Terminal > Run Task...**
-2. Select, **Sparrow: Build Firmware Using CMake and Make**
-
-### Install Sparrow Firmware
-
-1. Navigate to, **Terminal > Run Task...**
-2. Select, **Sparrow: Flash Firmware Using STM32_Programmer_CLI**
-
-### Debug Sparrow Firmware
-
-Hotkey: `Ctrl+Shift+D`
-
-1. Select **Run and Debug** menu from the leftmost toolbar.
-2. Press the green “Play” button next to **Cortex Debug**.
-
-STM32CubeIDE Instructions
--------------------------
-
-### Load the project into your workspace
-
-1. Open the STM32CubeIDE application.
-2. Navigate to **File > Open Projects from File System....**
-3. Press the **Directory...** button.
-4. Open the hidden folder, `.STM32CubeIDE`, from the newly cloned repository.
-5. Press the **Finish** button.
-
-### Build Sparrow Firmware
-
-1. Select the `sparrow` project
-2. Click the hammer icon to **Build 'Debug' for project 'sparrow'**.
-
-### Install Sparrow Firmware
-
-1. Select the `sparrow` project
-2. Click the play icon (green circle with white triangle) to **Run Device Debug**.
-
-### Debug Sparrow Firmware
-
-1. Select the `sparrow` project
-2. Click the bug icon to **Debug Device Debug**.
+For instructions on how to write applications for the Sparrow framework, please review the following [document: Writing Sparrow Applications](https://www.notion.so/blueswireless/Writing-Sparrow-Applications-afe42a432b444baf954be97ac355572c)
