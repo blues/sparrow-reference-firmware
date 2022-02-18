@@ -10,6 +10,7 @@ add_library(sparrow-application STATIC
     ${CMAKE_CURRENT_LIST_DIR}/contact-switch/contact-switch.c
     ${CMAKE_CURRENT_LIST_DIR}/diag/diag.c
     ${CMAKE_CURRENT_LIST_DIR}/hcsr04q/hcsr04q.c
+    ${CMAKE_CURRENT_LIST_DIR}/hc-sr04/hc-sr04.c
     ${CMAKE_CURRENT_LIST_DIR}/ping/ping.c
     ${CMAKE_CURRENT_LIST_DIR}/pir/pir.c
 )
@@ -20,6 +21,7 @@ target_include_directories(sparrow-application
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/contact-switch
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/diag
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/hcsr04q
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/hc-sr04
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ping
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/pir
 )

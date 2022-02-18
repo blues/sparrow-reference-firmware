@@ -8,6 +8,7 @@
 // Scheduled App Header(s)
 #include "bme/bme.h"
 #include "button/button.h"
+#include "hc-sr04/hc-sr04.h"
 #include "pir/pir.h"
 
 void schedAppInit (void) {
@@ -18,7 +19,12 @@ void schedAppInit (void) {
     pirInit();
 
     // Reports node identifier and signal health information on button click
-    if (!buttonInit()) {
-        APP_PRINTF("ERROR: Failed to initialize button application!\r\n");
+    // if (!buttonInit()) {
+    //     APP_PRINTF("ERROR: Failed to initialize button application!\r\n");
+    // }
+
+    // // Reports distance from sensor
+    if (!hcsr04Init()) {
+        APP_PRINTF("ERROR: Failed to initialize HC-SR04 application!\r\n");
     }
 }
