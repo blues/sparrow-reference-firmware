@@ -210,8 +210,11 @@ void resetInterrupt()
 }
 
 // Poller
-void pirPoll(int appID, int state)
+void pirPoll(int appID, int state, void *appContext)
 {
+
+    // Unused parameter(s)
+    (void)appContext;
 
     // Disable if this isn't a Sparrow reference board
     if (appSKU() != SKU_REFERENCE) {
@@ -290,10 +293,12 @@ static bool registerNotefileTemplate()
 }
 
 // Gateway Response handler
-void pirResponse(int appID, J *rsp)
+void pirResponse(int appID, J *rsp, void *appContext)
 {
+
     // Unused parameter(s)
     (void)appID;
+    (void)appContext;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
@@ -356,8 +361,11 @@ static void addNote(bool immediate)
 }
 
 // Interrupt handler
-void pirISR(int appID, uint16_t pins)
+void pirISR(int appID, uint16_t pins, void *appContext)
 {
+
+    // Unused parameter(s)
+    (void)appContext;
 
     // Set the state to 'motion' and immediately schedule
     if ((pins & PIR_DIRECT_LINK_Pin) != 0) {

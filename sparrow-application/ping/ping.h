@@ -12,6 +12,6 @@
 #include <note.h>
 
 bool pingInit(void);
-void pingISR(int appID, uint16_t pins);
-void pingPoll(int appID, int state);
-void pingResponse(int appID, J *rsp);
+void pingISR(int appID, uint16_t pins, void *appContext);
+void pingPoll(int appID, int state, void *appContext);
+void pingResponse(int appID, J *rsp, void *appContext);

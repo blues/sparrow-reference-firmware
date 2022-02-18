@@ -21,12 +21,13 @@ set(CMAKE_C_EXTENSIONS ON)  # required for inline asm
 set(EXECUTABLE sparrow)
 
 # Create variables to alias path names
-set(SDK ${CMAKE_CURRENT_LIST_DIR}/sparrow-lora)
 set(NOTE_C ${CMAKE_CURRENT_LIST_DIR}/note-c)
-set(SPARROW_APPLICATION ${CMAKE_CURRENT_LIST_DIR}/sparrow-application)
+set(SPARROW_LORA ${CMAKE_CURRENT_LIST_DIR}/sparrow-lora)
+set(SPARROW_APP_DIR ${CMAKE_CURRENT_LIST_DIR}/sparrow-application)
 
 # Set global compile settings
 add_compile_definitions(
+    CURRENT_BOARD=2  # Sparrow v1.1
     STM32WL55xx
     CORE_CM4
 )
@@ -76,89 +77,89 @@ target_include_directories(note-c
 
 # Compile ST platform seperately
 add_library(st OBJECT
-    ${SDK}/Application/Core/Src/system_stm32wlxx.c
-    ${SDK}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
-    ${SDK}/Application/STM32CubeIDE/sys/syscalls.c
-    ${SDK}/Application/STM32CubeIDE/sys/sysmem.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_comp.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cortex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_exti.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gpio.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gtzc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_hsem.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2s.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_ipcc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_irda.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_iwdg.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_lptim.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pka.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smbus.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_subghz.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart_ex.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_wwdg.c
-    ${SDK}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_utils.c
-    ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c
-    ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.c
-    ${SDK}/Utilities/lpm/tiny_lpm/stm32_lpm.c
-    ${SDK}/Utilities/misc/stm32_mem.c
-    ${SDK}/Utilities/misc/stm32_systime.c
-    ${SDK}/Utilities/misc/stm32_tiny_sscanf.c
-    ${SDK}/Utilities/misc/stm32_tiny_vsnprintf.c
-    ${SDK}/Utilities/sequencer/stm32_seq.c
-    ${SDK}/Utilities/timer/stm32_timer.c
-    ${SDK}/Utilities/trace/adv_trace/stm32_adv_trace.c
+    ${SPARROW_LORA}/Application/Core/Src/system_stm32wlxx.c
+    ${SPARROW_LORA}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
+    ${SPARROW_LORA}/Application/STM32CubeIDE/sys/syscalls.c
+    ${SPARROW_LORA}/Application/STM32CubeIDE/sys/sysmem.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_comp.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cortex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_exti.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gpio.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gtzc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_hsem.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2s.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_ipcc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_irda.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_iwdg.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_lptim.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pka.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smbus.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_subghz.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart_ex.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_wwdg.c
+    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_utils.c
+    ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c
+    ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.c
+    ${SPARROW_LORA}/Utilities/lpm/tiny_lpm/stm32_lpm.c
+    ${SPARROW_LORA}/Utilities/misc/stm32_mem.c
+    ${SPARROW_LORA}/Utilities/misc/stm32_systime.c
+    ${SPARROW_LORA}/Utilities/misc/stm32_tiny_sscanf.c
+    ${SPARROW_LORA}/Utilities/misc/stm32_tiny_vsnprintf.c
+    ${SPARROW_LORA}/Utilities/sequencer/stm32_seq.c
+    ${SPARROW_LORA}/Utilities/timer/stm32_timer.c
+    ${SPARROW_LORA}/Utilities/trace/adv_trace/stm32_adv_trace.c
 )
 
 target_include_directories(st SYSTEM
-    PRIVATE ${SDK}/Application
-    PRIVATE ${SDK}/Application/Core/Inc
-    PRIVATE ${SDK}/Application/Core/Radio
-    PRIVATE ${SDK}/Drivers/CMSIS/Core/Include
-    PUBLIC ${SDK}/Drivers/CMSIS/Device/ST/STM32WLxx/Include
-    PRIVATE ${SDK}/Drivers/CMSIS/DSP/Include
-    PUBLIC ${SDK}/Drivers/CMSIS/Include
-    PUBLIC ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc
-    PRIVATE ${SDK}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy
-    PUBLIC ${SDK}/Middlewares/Third_Party/SubGHz_Phy
-    PRIVATE ${SDK}/Middlewares/Third_Party/SubGHz_Phy/Conf
-    PRIVATE ${SDK}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver
-    PUBLIC ${SDK}/Utilities/lpm/tiny_lpm
-    PUBLIC ${SDK}/Utilities/misc
-    PUBLIC ${SDK}/Utilities/sequencer
-    PUBLIC ${SDK}/Utilities/timer
-    PUBLIC ${SDK}/Utilities/trace/adv_trace
+    PRIVATE ${SPARROW_LORA}/Application
+    PRIVATE ${SPARROW_LORA}/Application/Core/Inc
+    PRIVATE ${SPARROW_LORA}/Application/Core/Radio
+    PRIVATE ${SPARROW_LORA}/Drivers/CMSIS/Core/Include
+    PUBLIC ${SPARROW_LORA}/Drivers/CMSIS/Device/ST/STM32WLxx/Include
+    PRIVATE ${SPARROW_LORA}/Drivers/CMSIS/DSP/Include
+    PUBLIC ${SPARROW_LORA}/Drivers/CMSIS/Include
+    PUBLIC ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Inc
+    PRIVATE ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Inc/Legacy
+    PUBLIC ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy
+    PRIVATE ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/Conf
+    PRIVATE ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver
+    PUBLIC ${SPARROW_LORA}/Utilities/lpm/tiny_lpm
+    PUBLIC ${SPARROW_LORA}/Utilities/misc
+    PUBLIC ${SPARROW_LORA}/Utilities/sequencer
+    PUBLIC ${SPARROW_LORA}/Utilities/timer
+    PUBLIC ${SPARROW_LORA}/Utilities/trace/adv_trace
 )
 
 target_compile_options(st
@@ -169,44 +170,36 @@ target_compile_options(st
 
 # Compile Sparrow Runtime
 add_library(sparrow-runtime OBJECT
-    ${SDK}/Application/Core/Radio/radio_board_if.c
-    ${SDK}/Application/Core/Src/debug.c
-    ${SDK}/Application/Core/Src/stm32_lpm_if.c
-    ${SDK}/Application/Core/Src/stm32wlxx_hal_msp.c
-    ${SDK}/Application/Core/Src/stm32wlxx_it.c
-    ${SDK}/Application/Core/Src/timer_if.c
-    ${SDK}/Application/Core/Src/usart_if.c
-    ${SDK}/Application/Core/Src/util_if.c
-    ${SDK}/Application/Framework/app.c
-    ${SDK}/Application/Framework/appinit.c
-    ${SDK}/Application/Framework/atp.c
-    ${SDK}/Application/Framework/dfu.c
-    ${SDK}/Application/Framework/dfuload.c
-    ${SDK}/Application/Framework/flash.c
-    ${SDK}/Application/Framework/gateway.c
-    ${SDK}/Application/Framework/led.c
-    ${SDK}/Application/Framework/note.c
-    ${SDK}/Application/Framework/post.c
-    ${SDK}/Application/Framework/radioinit.c
-    ${SDK}/Application/Framework/sched.c
-    ${SDK}/Application/Framework/sensor.c
-    ${SDK}/Application/Framework/trace.c
-    ${SDK}/Application/Framework/util.c
-    ${SDK}/Application/Gateway/auth.c
-    # ${SDK}/Application/Sensor/bme280/bme280.c
-    # ${SDK}/Application/Sensor/bme.c
-    # ${SDK}/Application/Sensor/button.c
-    # ${SDK}/Application/Sensor/init.c
-    # ${SDK}/Application/Sensor/ping.c
-    # ${SDK}/Application/Sensor/pir.c
+    ${SPARROW_LORA}/Application/Core/Radio/radio_board_if.c
+    ${SPARROW_LORA}/Application/Core/Src/debug.c
+    ${SPARROW_LORA}/Application/Core/Src/stm32_lpm_if.c
+    ${SPARROW_LORA}/Application/Core/Src/stm32wlxx_hal_msp.c
+    ${SPARROW_LORA}/Application/Core/Src/stm32wlxx_it.c
+    ${SPARROW_LORA}/Application/Core/Src/timer_if.c
+    ${SPARROW_LORA}/Application/Core/Src/usart_if.c
+    ${SPARROW_LORA}/Application/Core/Src/util_if.c
+    ${SPARROW_LORA}/Application/Framework/app.c
+    ${SPARROW_LORA}/Application/Framework/appinit.c
+    ${SPARROW_LORA}/Application/Framework/atp.c
+    ${SPARROW_LORA}/Application/Framework/dfu.c
+    ${SPARROW_LORA}/Application/Framework/dfuload.c
+    ${SPARROW_LORA}/Application/Framework/flash.c
+    ${SPARROW_LORA}/Application/Framework/gateway.c
+    ${SPARROW_LORA}/Application/Framework/led.c
+    ${SPARROW_LORA}/Application/Framework/note.c
+    ${SPARROW_LORA}/Application/Framework/post.c
+    ${SPARROW_LORA}/Application/Framework/radioinit.c
+    ${SPARROW_LORA}/Application/Framework/sched.c
+    ${SPARROW_LORA}/Application/Framework/sensor.c
+    ${SPARROW_LORA}/Application/Framework/trace.c
+    ${SPARROW_LORA}/Application/Framework/util.c
+    ${SPARROW_LORA}/Application/Gateway/auth.c
 )
 
 target_include_directories(sparrow-runtime
-    PUBLIC ${SDK}/Application
-    PUBLIC ${SDK}/Application/Core/Inc
-    PUBLIC ${SDK}/Application/Framework
-    # PUBLIC ${SDK}/Application/Sensor
-    # PUBLIC ${SDK}/Application/Sensor/bme280
+    PUBLIC ${SPARROW_LORA}/Application
+    PUBLIC ${SPARROW_LORA}/Application/Core/Inc
+    PUBLIC ${SPARROW_LORA}/Application/Framework
 )
 
 add_dependencies(sparrow-runtime
@@ -219,10 +212,29 @@ target_link_libraries(sparrow-runtime
     PUBLIC st
 )
 
-# Pull in user-defined sensors
-if(IS_DIRECTORY ${SPARROW_APPLICATION})
-    if(EXISTS ${SPARROW_APPLICATION}/CMakeLists.txt)
-        add_subdirectory(${SPARROW_APPLICATION})
+if (SPARROW_LORA_ONLY)
+
+# Include core applications in compilation
+target_sources(sparrow-runtime
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/bme280/bme280.c
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/bme.c
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/button.c
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/init.c
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/ping.c
+    PRIVATE ${SPARROW_LORA}/Application/Sensor/pir.c
+)
+
+target_include_directories(sparrow-runtime
+    PUBLIC ${SPARROW_LORA}/Application/Sensor
+    PUBLIC ${SPARROW_LORA}/Application/Sensor/bme280
+)
+
+else() # NOT SPARROW_LORA_ONLY
+
+# Collect Sparrow Applications
+if(IS_DIRECTORY ${SPARROW_APP_DIR})
+    if(EXISTS ${SPARROW_APP_DIR}/CMakeLists.txt)
+        add_subdirectory(${SPARROW_APP_DIR})
         if (NOT TARGET sparrow-application)
             message(WARNING "Could not find the sparrow-application target. No user-defined sensors will be imported")
         endif()
@@ -231,9 +243,11 @@ if(IS_DIRECTORY ${SPARROW_APPLICATION})
     endif()
 endif()
 
+endif() # SPARROW_LORA_ONLY
+
 # Generate .elf .bin .hex .map and .list files
 add_executable(${EXECUTABLE}
-    ${SDK}/Application/Core/Src/main.c
+    ${SPARROW_LORA}/Application/Core/Src/main.c
 )
 
 add_dependencies(${EXECUTABLE}
@@ -248,7 +262,7 @@ target_link_libraries(${EXECUTABLE}
 
 if (TARGET sparrow-application)
     target_sources(${EXECUTABLE}
-        PRIVATE ${SPARROW_APPLICATION}/init.c
+        PRIVATE ${SPARROW_APP_DIR}/init.c
     )
 
     add_dependencies(${EXECUTABLE}
@@ -262,7 +276,7 @@ endif()
 
 target_link_options(${EXECUTABLE}
     PRIVATE -mcpu=cortex-m4
-    PRIVATE -T${SDK}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
+    PRIVATE -T${SPARROW_LORA}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
     PRIVATE --specs=nosys.specs
     PRIVATE -Wl,-Map=${PROJECT_NAME}.map
     PRIVATE -Wl,--gc-sections

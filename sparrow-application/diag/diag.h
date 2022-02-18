@@ -12,8 +12,8 @@
 // 3rd-party Libraries
 #include <note.h>
 
-bool diagActivate(int appID);
+bool diagActivate(int appID, void *appContext);
 bool diagInit(void);
-void diagISR(int appID, uint16_t pins);
-void diagPoll(int appID, int state);
-void diagResponse(int appID, J *rsp);
+void diagISR(int appID, uint16_t pins, void *appContext);
+void diagPoll(int appID, int state, void *appContext);
+void diagResponse(int appID, J *rsp, void *appContext);

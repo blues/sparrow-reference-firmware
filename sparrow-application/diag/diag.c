@@ -51,8 +51,11 @@ static bool registerNotefileTemplate(void);
 static int appID = -1;
 
 // Application Activation (on wake)
-bool diagActivate(int appID)
+bool diagActivate(int appID, void *appContext)
 {
+    // Unused parameter(s)
+    (void)appContext;
+
     APP_PRINTF("diag: Entered application callback function: diagActivate\r\n\tappId: %d\r\n", appID);
     done = false;
 
@@ -89,8 +92,11 @@ bool diagInit(void)
 }
 
 // Interrupt handler
-void diagISR(int appID, uint16_t pins)
+void diagISR(int appID, uint16_t pins, void *appContext)
 {
+    // Unused parameter(s)
+    (void)appContext;
+
     /*
      * This callback function is executed directly from the ISR.
      * Only perform ISR sensitive operations and exit quickly.
@@ -107,8 +113,11 @@ void diagISR(int appID, uint16_t pins)
 }
 
 // Poller
-void diagPoll(int appID, int state)
+void diagPoll(int appID, int state, void *appContext)
 {
+    // Unused parameter(s)
+    (void)appContext;
+
     APP_PRINTF("diag: Entered application callback function: diagPoll\r\n\tappId: %d\tstate: %s\r\n", appID, schedStateName(state));
 
     // Switch based upon state
@@ -150,8 +159,11 @@ void diagPoll(int appID, int state)
 }
 
 // Gateway Response handler
-void diagResponse(int appID, J *rsp)
+void diagResponse(int appID, J *rsp, void *appContext)
 {
+    // Unused parameter(s)
+    (void)appContext;
+
     APP_PRINTF("diag: Entered application callback function: diagResponse\r\n\tappId: %d", appID);
     char *json_string = JConvertToJSONString(rsp);
     APP_PRINTF("\trsp: %s\r\n", json_string);

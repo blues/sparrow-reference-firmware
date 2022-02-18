@@ -13,6 +13,7 @@
             "defines": [
                 "CMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-gcc-toolchain.cmake",
                 "CORE_CM4",
+                "CURRENT_BOARD=2",
                 "STM32WL55xx"
             ],
             "includePath": [

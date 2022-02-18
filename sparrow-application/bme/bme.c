@@ -98,8 +98,11 @@ bool bmeInit()
 }
 
 // Poller
-void bmePoll(int appID, int state)
+void bmePoll(int appID, int state, void *appContext)
 {
+
+    // Unused parameter(s)
+    (void)appContext;
 
     // Disable if this isn't a Sparrow reference board
     if (appSKU() != SKU_REFERENCE) {
@@ -173,10 +176,12 @@ static bool registerNotefileTemplate()
 }
 
 // Gateway Response handler
-void bmeResponse(int appID, J *rsp)
+void bmeResponse(int appID, J *rsp, void *appContext)
 {
+
     // Unused parameter(s)
     (void)appID;
+    (void)appContext;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {

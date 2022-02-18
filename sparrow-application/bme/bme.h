@@ -11,5 +11,5 @@
 #include <note.h>
 
 bool bmeInit(void);
-void bmePoll(int appID, int state);
-void bmeResponse(int appID, J *rsp);
+void bmePoll(int appID, int state, void *appContext);
+void bmeResponse(int appID, J *rsp, void *appContext);

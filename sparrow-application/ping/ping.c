@@ -60,8 +60,11 @@ bool pingInit()
 }
 
 // Poller
-void pingPoll(int appID, int state)
+void pingPoll(int appID, int state, void *appContext)
 {
+
+    // Unused parameter(s)
+    (void)appContext;
 
     // Switch based upon state
     switch (state) {
@@ -113,8 +116,11 @@ void pingPoll(int appID, int state)
 }
 
 // Interrupt handler
-void pingISR(int appID, uint16_t pins)
+void pingISR(int appID, uint16_t pins, void *appContext)
 {
+
+    // Unused parameter(s)
+    (void)appContext;
 
     // Set the state to button, and immediately schedule
     if ((pins & BUTTON1_Pin) != 0) {
@@ -263,10 +269,12 @@ static void addNote(uint32_t count)
 #endif
 
 // Gateway Response handler
-void pingResponse(int appID, J *rsp)
+void pingResponse(int appID, J *rsp, void *appContext)
 {
+
     // Unused parameter(s)
     (void)appID;
+    (void)appContext;
 
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
