@@ -17,7 +17,10 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           submodules: true
 
+      - name: Build Sparrow Lora Only in Container
+        id: sparrow-lora-only
+        uses: ./.github/actions/sparrow-lora-only
+
       - name: Build in Container
         id: build
         uses: ./.github/actions/build
-

@@ -1,0 +1,9 @@
+name: 'Build Sparrow Lora Only'
+description: '[sparrow-lora] Build Core using CMake and Make'
+runs:
+  using: 'docker'
+  image: '../../../Dockerfile'
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - 'rm -rf build/ && mkdir build && cd build/ && cmake -DSPARROW_LORA_ONLY=1 .. && make -j'
