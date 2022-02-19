@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/arm-gcc-toolchain.cmake)
 
 # Basic Project Configuration
-project(sparrow_sensor_framework
+project(sparrow_application_framework
     VERSION 1.0.0
     LANGUAGES C ASM
 )
@@ -278,7 +278,7 @@ target_link_options(${EXECUTABLE}
     PRIVATE -mcpu=cortex-m4
     PRIVATE -T${SPARROW_LORA}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
     PRIVATE --specs=nosys.specs
-    PRIVATE -Wl,-Map=${PROJECT_NAME}.map
+    PRIVATE -Wl,-Map=${EXECUTABLE}.map
     PRIVATE -Wl,--gc-sections
     PRIVATE -static
     PRIVATE --specs=nano.specs
