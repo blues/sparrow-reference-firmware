@@ -28,12 +28,12 @@ set(SPARROW_APP_DIR ${CMAKE_CURRENT_LIST_DIR}/sparrow-application)
 # Set global compile settings
 add_compile_definitions(
     CURRENT_BOARD=2  # Sparrow v1.1
-    STM32WL55xx
+    STM32WLE5xx
     CORE_CM4
 )
 add_compile_options(
     -mcpu=cortex-m4
-    # -std=gnu11
+    -std=gnu11
     -g3
     -c
     -O0
@@ -64,7 +64,6 @@ add_library(note-c STATIC
     ${NOTE_C}/n_hooks.c
     ${NOTE_C}/n_i2c.c
     ${NOTE_C}/n_md5.c
-    ${NOTE_C}/n_printf.c
     ${NOTE_C}/n_request.c
     ${NOTE_C}/n_serial.c
     ${NOTE_C}/n_str.c
@@ -78,64 +77,40 @@ target_include_directories(note-c
 # Compile ST platform seperately
 add_library(st OBJECT
     ${SPARROW_LORA}/Application/Core/Src/system_stm32wlxx.c
-    ${SPARROW_LORA}/Application/STM32CubeIDE/Application/Startup/startup_stm32wl55jcix.s
+    ${SPARROW_LORA}/Application/STM32CubeIDE/Application/Startup/startup_stm32wle5xx.s
     ${SPARROW_LORA}/Application/STM32CubeIDE/sys/syscalls.c
     ${SPARROW_LORA}/Application/STM32CubeIDE/sys/sysmem.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_adc_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_comp.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cortex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_crc_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_cryp_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dac_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_dma_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_exti.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_flash_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gpio.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_gtzc.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_hsem.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2c_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_i2s.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_ipcc.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_irda.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_iwdg.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_lptim.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pka.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_pwr_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rcc_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rng_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_rtc_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smartcard_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_smbus.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_spi_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_subghz.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_tim_ex.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart.c
     ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_uart_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_usart_ex.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_hal_wwdg.c
-    ${SPARROW_LORA}/Drivers/STM32WLxx_HAL_Driver/Src/stm32wlxx_ll_utils.c
     ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio.c
     ${SPARROW_LORA}/Middlewares/Third_Party/SubGHz_Phy/stm32_radio_driver/radio_driver.c
     ${SPARROW_LORA}/Utilities/lpm/tiny_lpm/stm32_lpm.c
     ${SPARROW_LORA}/Utilities/misc/stm32_mem.c
     ${SPARROW_LORA}/Utilities/misc/stm32_systime.c
-    ${SPARROW_LORA}/Utilities/misc/stm32_tiny_sscanf.c
     ${SPARROW_LORA}/Utilities/misc/stm32_tiny_vsnprintf.c
     ${SPARROW_LORA}/Utilities/sequencer/stm32_seq.c
     ${SPARROW_LORA}/Utilities/timer/stm32_timer.c
@@ -276,7 +251,7 @@ endif()
 
 target_link_options(${EXECUTABLE}
     PRIVATE -mcpu=cortex-m4
-    PRIVATE -T${SPARROW_LORA}/Application/STM32CubeIDE/STM32WL55JCIX_FLASH.ld
+    PRIVATE -T${SPARROW_LORA}/Application/STM32CubeIDE/STM32WLE5xx_FLASH.ld
     PRIVATE --specs=nosys.specs
     PRIVATE -Wl,-Map=${EXECUTABLE}.map
     PRIVATE -Wl,--gc-sections

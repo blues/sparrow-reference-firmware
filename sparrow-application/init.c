@@ -21,7 +21,7 @@ void schedAppInit (void) {
         APP_PRINTF("ERROR: Failed to initialize PIR application!\r\n");
     }
 
-    // Reports memory usage at timed interval or on button click
+    // Reports node identifier and signal health information on button click
     if (!buttonInit()) {
         APP_PRINTF("ERROR: Failed to initialize button application!\r\n");
     }
