@@ -7,7 +7,7 @@
 
 // Scheduled App Header(s)
 #include "bme/bme.h"
-#include "diag/diag.h"
+#include "button/button.h"
 #include "pir/pir.h"
 
 void schedAppInit (void) {
@@ -22,7 +22,7 @@ void schedAppInit (void) {
     }
 
     // Reports memory usage at timed interval or on button click
-    if (!diagInit()) {
-        APP_PRINTF("ERROR: Failed to initialize diagnostic application!\r\n");
+    if (!buttonInit()) {
+        APP_PRINTF("ERROR: Failed to initialize button application!\r\n");
     }
 }

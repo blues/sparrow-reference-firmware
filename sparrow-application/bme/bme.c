@@ -7,13 +7,15 @@
 // Standard Header(s)
 #include <math.h>
 
-// Sparrow Header(s)
-#include <framework.h>
-
 // ST Header(s)
 #include <main.h>
 
-#include "bme280/bme280.h"
+// Blues Header(s)
+#include <framework.h>
+#include <note.h>
+
+// 3rd-party Libraries
+#include <bme280/bme280.h>
 
 // Special request IDs
 #define REQUESTID_TEMPLATE          1
@@ -70,6 +72,7 @@ bool bmeInit()
         .interruptFn = NULL,
         .pollFn = bmePoll,
         .responseFn = bmeResponse,
+        .appContext = NULL,
     };
     appID = schedRegisterApp(&config);
     if (appID < 0) {

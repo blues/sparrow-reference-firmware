@@ -7,8 +7,8 @@
 // Standard Libraries
 #include <stdbool.h>
 
-// 3rd-party Libraries
-#include <note.h>
+// Forward Declaration(s)
+typedef struct J J;
 
 bool bmeInit(void);
 void bmePoll(int appID, int state, void *appContext);

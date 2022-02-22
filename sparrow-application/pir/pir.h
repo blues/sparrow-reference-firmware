@@ -8,8 +8,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// 3rd-party Libraries
-#include <note.h>
+// Forward Declaration(s)
+typedef struct J J;
 
 bool pirInit(void);
 void pirISR(int appID, uint16_t pins, void *appContext);

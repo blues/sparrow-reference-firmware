@@ -4,8 +4,14 @@
 
 #include "ping.h"
 
-// Sparrow Header(s)
+// Blues Header(s)
 #include <framework.h>
+#include <note.h>
+
+// If TRUE, we're in survey mode in which the button is used to send
+// pings that include RSSI/SNR transmitted at full power, and all
+// scheduled activities are disabled.
+#define SURVEY_MODE                 false
 
 // States for the local state machine
 #define STATE_BUTTON          0
@@ -48,6 +54,7 @@ bool pingInit()
         .interruptFn = pingISR,
         .pollFn = pingPoll,
         .responseFn = pingResponse,
+        .appContext = NULL,
     };
     appID = schedRegisterApp(&config);
     if (appID < 0) {
@@ -75,7 +82,7 @@ void pingPoll(int appID, int state, void *appContext)
 
 #if SURVEY_MODE
 
-        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+        schedSetState(appID, STATE_DEACTIVATED, "ping: nothing to do");
         break;
 
 #else

@@ -4,11 +4,17 @@
 
 #include "pir.h"
 
-// Sparrow Header(s)
-#include <framework.h>
-
 // ST Header(s)
 #include <main.h>
+
+// Blues Header(s)
+#include <framework.h>
+#include <note.h>
+
+// Suppression timer for PIR activity, so that in a high-activity area
+// it isn't continuously sending messages
+#define PIR_SUPPRESSION_MINS        15
+static int64_t lastInterruptMs = 0;
 
 // States for the local state machine
 #define STATE_MOTION_CHECK  0
@@ -50,6 +56,7 @@ bool pirInit()
         .interruptFn = pirISR,
         .pollFn = pirPoll,
         .responseFn = pirResponse,
+        .appContext = NULL,
     };
     appID = schedRegisterApp(&config);
     if (appID < 0) {
@@ -233,8 +240,7 @@ void pirPoll(int appID, int state, void *appContext)
             APP_PRINTF("pir: template registration request\r\n");
             break;
         }
-
-    // fallthrough to do a motion check
+        // fallthrough to do a motion check
 
     case STATE_MOTION_CHECK:
         if (motionEvents == 0) {
@@ -369,12 +375,29 @@ void pirISR(int appID, uint16_t pins, void *appContext)
 
     // Set the state to 'motion' and immediately schedule
     if ((pins & PIR_DIRECT_LINK_Pin) != 0) {
+
+        // Record the motion event
         motionEvents++;
         motionEventsTotal++;
         resetInterrupt();
+
+        // See if we're past the suppression interval
+        int64_t nowMs = TIMER_IF_GetTimeMs();
+        if (lastInterruptMs == 0) {
+            lastInterruptMs = nowMs;
+        } else {
+            uint32_t elapsedSecs = (uint32_t) (nowMs - lastInterruptMs) / 1000;
+            lastInterruptMs = nowMs;
+            if (elapsedSecs < (PIR_SUPPRESSION_MINS*60)) {
+                return;
+            }
+        }
+
+        // Activate the scheduler
         if (!schedIsActive(appID)) {
             schedActivateNowFromISR(appID, true, STATE_MOTION_CHECK);
         }
+
         return;
     }
 

@@ -10,8 +10,9 @@
 // ST Header(s)
 #include <main.h>  // ST system function declarations
 
-// Sparrow Header(s)
+// Blues Header(s)
 #include <framework.h>
+#include <note.h>
 
 // States for the local state machine
 #define STATE_DIAG_CHECK       0
@@ -78,6 +79,7 @@ bool diagInit(void)
         .interruptFn = diagISR,
         .pollFn = diagPoll,
         .responseFn = diagResponse,
+        .appContext = NULL,
     };
     appID = schedRegisterApp(&config);
     if (appID < 0) {

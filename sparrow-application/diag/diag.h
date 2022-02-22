@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// 3rd-party Libraries
-#include <note.h>
+// Forward Declaration(s)
+typedef struct J J;
 
 bool diagActivate(int appID, void *appContext);
 bool diagInit(void);
