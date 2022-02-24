@@ -13,6 +13,7 @@
             "request": "launch",
             "device": "STM32WL55CC_M4",
             "servertype": "stlink",
+            "stm32cubeprogrammer": "/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.100.202110141430/tools/bin"
         }
     ]
 }
