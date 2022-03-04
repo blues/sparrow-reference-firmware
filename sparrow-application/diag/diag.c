@@ -24,10 +24,8 @@
 #define ISR_MAX_CALL_RETENTION 8
 #define ISR_COUNTER_MASK       ~0xFFFFFFF8
 
-// The filename of the test database.  Note that * is replaced by the
-// gateway with the Sparrow node's ID, while the # is a special character
-// reserved by the Notecard and Notehub for a Scheduled App ID that is
-// appended to the device ID within Events.
+// The dynamic filename of the application specific queue.
+// NOTE: The Gateway will replace `*` with the originating node's ID.
 #define APPLICATION_NOTEFILE "*#diag.qo"
 
 typedef struct ISR_parameters {

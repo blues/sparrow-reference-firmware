@@ -22,10 +22,8 @@ static int64_t lastInterruptMs = 0;
 // Special request IDs
 #define REQUESTID_TEMPLATE  1
 
-// The filename of the test database.  Note that * is replaced by the
-// gateway with the Sparrow node's ID, while the # is a special character
-// reserved by the Notecard and Notehub for a Scheduled App ID that is
-// appended to the device ID within Events.
+// The dynamic filename of the application specific queue.
+// NOTE: The Gateway will replace `*` with the originating node's ID.
 #define APPLICATION_NOTEFILE "*#motion.qo"
 
 // TRUE if we've successfully registered the template
