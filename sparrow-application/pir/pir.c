@@ -61,7 +61,7 @@ bool pirInit()
         return false;
     }
 
-    // Initialize GPIOs as per data sheet 2.6 and 2.7
+    // Initialize GPIOs as per data sheet 2.6
     GPIO_InitTypeDef init = {0};
     init.Mode = GPIO_MODE_OUTPUT_PP;
     init.Pull = GPIO_NOPULL;
@@ -69,13 +69,6 @@ bool pirInit()
     init.Pin = PIR_SERIAL_IN_Pin;
     HAL_GPIO_Init(PIR_SERIAL_IN_Port, &init);
     HAL_GPIO_WritePin(PIR_SERIAL_IN_Port, PIR_SERIAL_IN_Pin, GPIO_PIN_RESET);
-    init.Mode = GPIO_MODE_INPUT;
-    init.Pull = GPIO_PULLDOWN;
-    init.Speed = GPIO_SPEED_FREQ_HIGH;
-    init.Pin = PIR_DIRECT_LINK_Pin;
-    HAL_GPIO_Init(PIR_DIRECT_LINK_Port, &init);
-    HAL_NVIC_SetPriority(PIR_DIRECT_LINK_EXTI_IRQn, PIR_DIRECT_LINK_IT_PRIORITY, 0x00);
-    HAL_NVIC_EnableIRQ(PIR_DIRECT_LINK_EXTI_IRQn);
 
     // Prepare to configure the module
     uint32_t configurationRegister = 0;
@@ -193,6 +186,7 @@ bool pirInit()
 // Reset the interrupt according to datasheet 2.7 "Wake Up Mode"
 void resetInterrupt()
 {
+    // Initialize GPIOs as per data sheet 2.7
     GPIO_InitTypeDef init = {0};
     init.Mode = GPIO_MODE_OUTPUT_PP;
     init.Pull = GPIO_NOPULL;
