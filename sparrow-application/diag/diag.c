@@ -21,8 +21,8 @@
 // Special request IDs
 #define REQUESTID_TEMPLATE     2
 
-#define ISR_MAX_CALL_RETENTION 8
-#define ISR_COUNTER_MASK       ~0xFFFFFFF8
+#define ISR_MAX_CALL_RETENTION 8  // Must be a power of 2
+#define ISR_COUNTER_MASK       ~(ISR_MAX_CALL_RETENTION - 1)
 
 // The dynamic filename of the application specific queue.
 // NOTE: The Gateway will replace `*` with the originating node's ID.
@@ -73,6 +73,10 @@ bool diagInit(void)
     ctx->isrOverflow = false;
     ctx->templateRegistered = false;
     ctx->done = false;
+    for (size_t i = 0 ; i < ISR_MAX_CALL_RETENTION ; ++i) {
+        ctx->isrParams[i].appID = 0;
+        ctx->isrParams[i].pins = 0;
+    }
 
     // Register the application
     schedAppConfig config = {
@@ -139,6 +143,7 @@ void diagPoll(int appID, int state, void *appContext)
     case STATE_DIAG_ISR_XFER:
         APP_PRINTF("diag: Transfered from application ISR callback function.\r\n");
         APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (ctx->isrOverflow ? "more than" : ""), (ctx->isrOverflow ? ISR_MAX_CALL_RETENTION : ctx->isrCount));
+        if (ctx->isrOverflow) { ctx->isrCount = ISR_MAX_CALL_RETENTION; }
         for (size_t i = 0 ; i < ctx->isrCount ; ++i) {
             APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, ctx->isrParams[i].appID, ctx->isrParams[i].pins);
         }
