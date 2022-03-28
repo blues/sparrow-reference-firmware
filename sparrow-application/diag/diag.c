@@ -22,7 +22,7 @@
 #define REQUESTID_TEMPLATE     2
 
 #define ISR_MAX_CALL_RETENTION 8  // Must be a power of 2
-#define ISR_COUNTER_MASK       ~(ISR_MAX_CALL_RETENTION - 1)
+#define ISR_COUNTER_MASK       (ISR_MAX_CALL_RETENTION - 1)
 
 // The dynamic filename of the application specific queue.
 // NOTE: The Gateway will replace `*` with the originating node's ID.
@@ -47,6 +47,7 @@ typedef struct applicationContext {
 // Forwards
 static void addNote(bool immediate);
 static bool registerNotefileTemplate(void);
+static inline void resetIsrValues(applicationContext *ctx);
 
 // Application Activation (on wake)
 bool diagActivate(int appID, void *appContext)
@@ -69,14 +70,9 @@ bool diagInit(void)
 
     // Allocate and initialize application context
     applicationContext *ctx = (applicationContext *)malloc(sizeof(applicationContext));
-    ctx->isrCount = 0;
-    ctx->isrOverflow = false;
     ctx->templateRegistered = false;
     ctx->done = false;
-    for (size_t i = 0 ; i < ISR_MAX_CALL_RETENTION ; ++i) {
-        ctx->isrParams[i].appID = 0;
-        ctx->isrParams[i].pins = 0;
-    }
+    resetIsrValues(ctx);
 
     // Register the application
     schedAppConfig config = {
@@ -112,7 +108,7 @@ void diagISR(int appID, uint16_t pins, void *appContext)
      */
     ctx->isrParams[ctx->isrCount].appID = appID;
     ctx->isrParams[ctx->isrCount].pins = pins;
-    ++(ctx->isrCount);
+    ctx->isrCount++;
     ctx->isrCount = (ISR_COUNTER_MASK & ctx->isrCount);
     ctx->isrOverflow = (ctx->isrOverflow || !ctx->isrCount);
 
@@ -147,9 +143,8 @@ void diagPoll(int appID, int state, void *appContext)
         for (size_t i = 0 ; i < ctx->isrCount ; ++i) {
             APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, ctx->isrParams[i].appID, ctx->isrParams[i].pins);
         }
-        ctx->isrCount = 0;
-        ctx->isrOverflow = false; // fall through
-        // now report diagnostics
+        resetIsrValues(ctx);
+        // fall through and report diagnostics
 
     case STATE_DIAG_CHECK:
         if (ctx->done) {
@@ -280,4 +275,17 @@ static bool registerNotefileTemplate()
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
     return true;
+}
+
+// Reset the ISR field values
+static inline void resetIsrValues(applicationContext *ctx)
+{
+    APP_PRINTF("diag: resetting ISR values\r\n");
+
+    ctx->isrCount = 0;
+    ctx->isrOverflow = false;
+    for (size_t i = 0 ; i < ISR_MAX_CALL_RETENTION ; ++i) {
+        ctx->isrParams[i].appID = 0;
+        ctx->isrParams[i].pins = 0;
+    }
 }
