@@ -15,8 +15,9 @@
 #include <note.h>
 
 // States for the local state machine
-#define STATE_DIAG_CHECK       0
-#define STATE_DIAG_ISR_XFER    1
+#define STATE_DIAG_ABORT       0
+#define STATE_DIAG_CHECK       1
+#define STATE_DIAG_ISR_XFER    2
 
 // Special request IDs
 #define REQUESTID_TEMPLATE     2
@@ -28,16 +29,16 @@
 // NOTE: The Gateway will replace `*` with the originating node's ID.
 #define APPLICATION_NOTEFILE "*#diag.qo"
 
-typedef struct ISR_parameters {
+typedef struct isrParameters {
     int appID;
     uint16_t pins;
-} ISR_parameters;
+} isrParameters;
 
 typedef struct applicationContext {
     // ISR call ring-buffer
     volatile size_t isrCount;
     volatile bool isrOverflow;
-    ISR_parameters isrParams[ISR_MAX_CALL_RETENTION];
+    isrParameters isrParams[ISR_MAX_CALL_RETENTION];
 
     // Application status
     bool templateRegistered;  // Only `true` once we've successfully registered the template
@@ -130,7 +131,7 @@ void diagPoll(int appID, int state, void *appContext)
     case STATE_ACTIVATED:
         if (!ctx->templateRegistered) {
             registerNotefileTemplate();
-            schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_ACTIVATED);
+            schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_ABORT);
         } else {
             schedSetState(appID, STATE_DIAG_CHECK, "diag: process diagnostics");
         }
@@ -152,9 +153,12 @@ void diagPoll(int appID, int state, void *appContext)
             break;
         }
         addNote(true);
-        schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_CHECK);
-        ctx->done = true;
-        APP_PRINTF("diag: note queued\r\n");
+        schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_ABORT);
+        APP_PRINTF("diag: note request sent\r\n");
+        break;
+
+    case STATE_DIAG_ABORT:
+        schedSetState(appID, STATE_DEACTIVATED, "diag: aborted due to failure!");
         break;
     default:
         ;
@@ -175,6 +179,7 @@ void diagResponse(int appID, J *rsp, void *appContext)
     // If this is a response timeout, indicate as such
     if (rsp == NULL) {
         APP_PRINTF("diag: response timeout\r\n");
+        schedSetState(appID, STATE_DIAG_ABORT, "diag: aborting...");
         return;
     }
 
@@ -182,6 +187,7 @@ void diagResponse(int appID, J *rsp, void *appContext)
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
         APP_PRINTF("diag: app error response: %d\r\n", err);
+        schedSetState(appID, STATE_DIAG_ABORT, "diag: aborting...");
         return;
     }
 
@@ -194,6 +200,7 @@ void diagResponse(int appID, J *rsp, void *appContext)
         break;
     default:
         APP_PRINTF("diag: SUCCESSFUL Note submission\r\n");
+        ctx->done = true;
     }
 }
 
