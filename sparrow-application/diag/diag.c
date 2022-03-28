@@ -112,7 +112,7 @@ void diagISR(int appID, uint16_t pins, void *appContext)
      */
     ctx->isrParams[ctx->isrCount].appID = appID;
     ctx->isrParams[ctx->isrCount].pins = pins;
-    ++ctx->isrCount;
+    ++(ctx->isrCount);
     ctx->isrCount = (ISR_COUNTER_MASK & ctx->isrCount);
     ctx->isrOverflow = (ctx->isrOverflow || !ctx->isrCount);
 
