@@ -21,8 +21,8 @@
 // Special request IDs
 #define REQUESTID_TEMPLATE     2
 
-#define ISR_MAX_CALL_RETENTION 8
-#define ISR_COUNTER_MASK       ~0xFFFFFFF8
+#define ISR_MAX_CALL_RETENTION 8  // Must be a power of 2
+#define ISR_COUNTER_MASK       (ISR_MAX_CALL_RETENTION - 1)
 
 // The dynamic filename of the application specific queue.
 // NOTE: The Gateway will replace `*` with the originating node's ID.
@@ -33,30 +33,30 @@ typedef struct ISR_parameters {
     uint16_t pins;
 } ISR_parameters;
 
-// ISR call ring-buffer
-static volatile size_t isr_count = 0;
-static volatile bool isr_overflow = false;
-static ISR_parameters isr_params[ISR_MAX_CALL_RETENTION];
+typedef struct applicationContext {
+    // ISR call ring-buffer
+    volatile size_t isrCount;
+    volatile bool isrOverflow;
+    ISR_parameters isrParams[ISR_MAX_CALL_RETENTION];
 
-// TRUE if we've successfully registered the template
-static bool templateRegistered = false;
-static bool done = false;
+    // Application status
+    bool templateRegistered;  // Only `true` once we've successfully registered the template
+    bool done;
+} applicationContext;
 
 // Forwards
 static void addNote(bool immediate);
 static bool registerNotefileTemplate(void);
-
-// Our scheduled app's ID
-static int appID = -1;
+static inline void resetIsrValues(applicationContext *ctx);
 
 // Application Activation (on wake)
 bool diagActivate(int appID, void *appContext)
 {
-    // Unused parameter(s)
-    (void)appContext;
+    // Load Application Context
+    applicationContext *ctx = appContext;
 
     APP_PRINTF("diag: Entered application callback function: diagActivate\r\n\tappId: %d\r\n", appID);
-    done = false;
+    ctx->done = false;
 
     // Success
     return true;
@@ -68,6 +68,12 @@ bool diagInit(void)
     APP_PRINTF("diag: Initializing application...\r\n");
     bool result = false;
 
+    // Allocate and initialize application context
+    applicationContext *ctx = (applicationContext *)malloc(sizeof(applicationContext));
+    ctx->templateRegistered = false;
+    ctx->done = false;
+    resetIsrValues(ctx);
+
     // Register the application
     schedAppConfig config = {
         .name = "diagnostic",
@@ -77,10 +83,9 @@ bool diagInit(void)
         .interruptFn = diagISR,
         .pollFn = diagPoll,
         .responseFn = diagResponse,
-        .appContext = NULL,
+        .appContext = ctx,
     };
-    appID = schedRegisterApp(&config);
-    if (appID < 0) {
+    if (schedRegisterApp(&config) < 0) {
         // Failure
         result = false;
     } else {
@@ -94,18 +99,18 @@ bool diagInit(void)
 // Interrupt handler
 void diagISR(int appID, uint16_t pins, void *appContext)
 {
-    // Unused parameter(s)
-    (void)appContext;
+    // Load Application Context
+    applicationContext *ctx = appContext;
 
     /*
      * This callback function is executed directly from the ISR.
      * Only perform ISR sensitive operations and exit quickly.
      */
-    isr_params[isr_count].appID = appID;
-    isr_params[isr_count].pins = pins;
-    ++isr_count;
-    isr_count = (ISR_COUNTER_MASK & isr_count);
-    isr_overflow = (isr_overflow || !isr_count);
+    ctx->isrParams[ctx->isrCount].appID = appID;
+    ctx->isrParams[ctx->isrCount].pins = pins;
+    ctx->isrCount++;
+    ctx->isrCount = (ISR_COUNTER_MASK & ctx->isrCount);
+    ctx->isrOverflow = (ctx->isrOverflow || !ctx->isrCount);
 
 	if (!schedIsActive(appID) && (pins & BUTTON1_Pin)) {
         schedActivateNowFromISR(appID, true, STATE_DIAG_ISR_XFER);
@@ -115,18 +120,17 @@ void diagISR(int appID, uint16_t pins, void *appContext)
 // Poller
 void diagPoll(int appID, int state, void *appContext)
 {
-    // Unused parameter(s)
-    (void)appContext;
+    // Load Application Context
+    applicationContext *ctx = appContext;
 
     APP_PRINTF("diag: Entered application callback function: diagPoll\r\n\tappId: %d\tstate: %s\r\n", appID, schedStateName(state));
 
     // Switch based upon state
     switch (state) {
     case STATE_ACTIVATED:
-        if (!templateRegistered) {
+        if (!ctx->templateRegistered) {
             registerNotefileTemplate();
             schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_ACTIVATED);
-            APP_PRINTF("diag: template registration request\r\n");
         } else {
             schedSetState(appID, STATE_DIAG_CHECK, "diag: process diagnostics");
         }
@@ -134,24 +138,23 @@ void diagPoll(int appID, int state, void *appContext)
 
     case STATE_DIAG_ISR_XFER:
         APP_PRINTF("diag: Transfered from application ISR callback function.\r\n");
-        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (isr_overflow ? "more than" : ""), (isr_overflow ? ISR_MAX_CALL_RETENTION : isr_count));
-        for (size_t i = 0 ; i < isr_count ; ++i) {
-            APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, isr_params[i].appID, isr_params[i].pins);
+        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (ctx->isrOverflow ? "more than" : ""), (ctx->isrOverflow ? ISR_MAX_CALL_RETENTION : ctx->isrCount));
+        if (ctx->isrOverflow) { ctx->isrCount = ISR_MAX_CALL_RETENTION; }
+        for (size_t i = 0 ; i < ctx->isrCount ; ++i) {
+            APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, ctx->isrParams[i].appID, ctx->isrParams[i].pins);
         }
-        isr_count = 0;
-        isr_overflow = false; // fall through
-        // now report diagnostics
+        resetIsrValues(ctx);
+        // fall through and report diagnostics
 
     case STATE_DIAG_CHECK:
-        if (done) {
+        if (ctx->done) {
             schedSetState(appID, STATE_DEACTIVATED, "diag: completed");
             break;
         }
-        APP_PRINTF("diag: generating diagnostic report\r\n");
         addNote(true);
         schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_CHECK);
+        ctx->done = true;
         APP_PRINTF("diag: note queued\r\n");
-        done = true;
         break;
     default:
         ;
@@ -161,8 +164,8 @@ void diagPoll(int appID, int state, void *appContext)
 // Gateway Response handler
 void diagResponse(int appID, J *rsp, void *appContext)
 {
-    // Unused parameter(s)
-    (void)appContext;
+    // Load Application Context
+    applicationContext *ctx = appContext;
 
     APP_PRINTF("diag: Entered application callback function: diagResponse\r\n\tappId: %d", appID);
     char *json_string = JConvertToJSONString(rsp);
@@ -186,7 +189,7 @@ void diagResponse(int appID, J *rsp, void *appContext)
     switch (JGetInt(rsp, "id")) {
 
     case REQUESTID_TEMPLATE:
-        templateRegistered = true;
+        ctx->templateRegistered = true;
         APP_PRINTF("diag: SUCCESSFUL template registration\r\n");
         break;
     default:
@@ -197,6 +200,8 @@ void diagResponse(int appID, J *rsp, void *appContext)
 // Send the application data
 static void addNote(bool immediate)
 {
+    APP_PRINTF("diag: generating diagnostic report\r\n");
+
     // Create the request
     J *req = NoteNewRequest("note.add");
     if (req == NULL) {
@@ -233,6 +238,8 @@ static void addNote(bool immediate)
 // Register the notefile template for our data
 static bool registerNotefileTemplate()
 {
+    APP_PRINTF("diag: template registration request\r\n");
+
     // Create the request
     J *req = NoteNewRequest("note.template");
     if (req == NULL) {
@@ -268,4 +275,17 @@ static bool registerNotefileTemplate()
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
     return true;
+}
+
+// Reset the ISR field values
+static inline void resetIsrValues(applicationContext *ctx)
+{
+    APP_PRINTF("diag: resetting ISR values\r\n");
+
+    ctx->isrCount = 0;
+    ctx->isrOverflow = false;
+    for (size_t i = 0 ; i < ISR_MAX_CALL_RETENTION ; ++i) {
+        ctx->isrParams[i].appID = 0;
+        ctx->isrParams[i].pins = 0;
+    }
 }
