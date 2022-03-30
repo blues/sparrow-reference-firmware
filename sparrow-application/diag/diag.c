@@ -20,14 +20,15 @@
 #define STATE_DIAG_ISR_XFER    2
 
 // Special request IDs
-#define REQUESTID_TEMPLATE     2
+#define REQUESTID_DIAGNOTE     9171979
+#define REQUESTID_TEMPLATE     19790917
 
 #define ISR_MAX_CALL_RETENTION 8  // Must be a power of 2
 #define ISR_COUNTER_MASK       (ISR_MAX_CALL_RETENTION - 1)
 
 // The dynamic filename of the application specific queue.
 // NOTE: The Gateway will replace `*` with the originating node's ID.
-#define APPLICATION_NOTEFILE "*#diag.qo"
+#define APPLICATION_NOTEFILE   "*#diag.qo"
 
 typedef struct isrParameters {
     int appID;
@@ -46,7 +47,8 @@ typedef struct applicationContext {
 } applicationContext;
 
 // Forwards
-static void addNote(bool immediate);
+static void addDiagnosticNote(bool immediate);
+static const char * diagStateName (int state);
 static bool registerNotefileTemplate(void);
 static inline void resetIsrValues(applicationContext *ctx);
 
@@ -113,7 +115,7 @@ void diagISR(int appID, uint16_t pins, void *appContext)
     ctx->isrCount = (ISR_COUNTER_MASK & ctx->isrCount);
     ctx->isrOverflow = (ctx->isrOverflow || !ctx->isrCount);
 
-	if (!schedIsActive(appID) && (pins & BUTTON1_Pin)) {
+	if ((pins & BUTTON1_Pin) && !schedIsActive(appID)) {
         schedActivateNowFromISR(appID, true, STATE_DIAG_ISR_XFER);
     }
 }
@@ -124,7 +126,7 @@ void diagPoll(int appID, int state, void *appContext)
     // Load Application Context
     applicationContext *ctx = appContext;
 
-    APP_PRINTF("diag: Entered application callback function: diagPoll\r\n\tappId: %d\tstate: %s\r\n", appID, schedStateName(state));
+    APP_PRINTF("diag: Entered application callback function: diagPoll\r\n\tappId: %d\tstate: %s\r\n", appID, diagStateName(state));
 
     // Switch based upon state
     switch (state) {
@@ -139,7 +141,7 @@ void diagPoll(int appID, int state, void *appContext)
 
     case STATE_DIAG_ISR_XFER:
         APP_PRINTF("diag: Transfered from application ISR callback function.\r\n");
-        APP_PRINTF("diag: ISR callback function called %s <%d> times.\r\n", (ctx->isrOverflow ? "more than" : ""), (ctx->isrOverflow ? ISR_MAX_CALL_RETENTION : ctx->isrCount));
+        APP_PRINTF("diag: ISR callback function called %s<%d> time(s).\r\n", (ctx->isrOverflow ? "more than " : ""), (ctx->isrOverflow ? ISR_MAX_CALL_RETENTION : ctx->isrCount));
         if (ctx->isrOverflow) { ctx->isrCount = ISR_MAX_CALL_RETENTION; }
         for (size_t i = 0 ; i < ctx->isrCount ; ++i) {
             APP_PRINTF("diag: call %d:\tappId: %d\tpins: %d\r\n", i, ctx->isrParams[i].appID, ctx->isrParams[i].pins);
@@ -149,17 +151,17 @@ void diagPoll(int appID, int state, void *appContext)
 
     case STATE_DIAG_CHECK:
         if (ctx->done) {
-            schedSetState(appID, STATE_DEACTIVATED, "diag: completed");
+            schedSetState(appID, STATE_DEACTIVATED, "diag: completed successfully");
             break;
         }
-        addNote(true);
+        addDiagnosticNote(true);
         schedSetCompletionState(appID, STATE_DIAG_CHECK, STATE_DIAG_ABORT);
-        APP_PRINTF("diag: note request sent\r\n");
         break;
 
     case STATE_DIAG_ABORT:
         schedSetState(appID, STATE_DEACTIVATED, "diag: aborted due to failure!");
         break;
+
     default:
         ;
     }
@@ -176,13 +178,6 @@ void diagResponse(int appID, J *rsp, void *appContext)
     APP_PRINTF("\trsp: %s\r\n", json_string);
     free(json_string);
 
-    // If this is a response timeout, indicate as such
-    if (rsp == NULL) {
-        APP_PRINTF("diag: response timeout\r\n");
-        schedSetState(appID, STATE_DIAG_ABORT, "diag: aborting...");
-        return;
-    }
-
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
@@ -193,32 +188,28 @@ void diagResponse(int appID, J *rsp, void *appContext)
 
     // Flash the LED if this is a response to this specific ping request
     switch (JGetInt(rsp, "id")) {
-
+    case REQUESTID_DIAGNOTE:
+        ctx->done = true;
+        APP_PRINTF("diag: SUCCESSFUL Note submission\r\n");
+        break;
     case REQUESTID_TEMPLATE:
         ctx->templateRegistered = true;
         APP_PRINTF("diag: SUCCESSFUL template registration\r\n");
         break;
     default:
-        APP_PRINTF("diag: SUCCESSFUL Note submission\r\n");
-        ctx->done = true;
+        ;
+        APP_PRINTF("diag: received unexpected response\r\n");
     }
 }
 
 // Send the application data
-static void addNote(bool immediate)
+static void addDiagnosticNote(bool immediate)
 {
     APP_PRINTF("diag: generating diagnostic report\r\n");
 
     // Create the request
     J *req = NoteNewRequest("note.add");
     if (req == NULL) {
-        return;
-    }
-
-    // Create the body
-    J *body = JAddObjectToObject(req, "body");
-    if (body == NULL) {
-        JDelete(req);
         return;
     }
 
@@ -230,16 +221,48 @@ static void addNote(bool immediate)
     // Set the target notefile
     JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
+    // Add an ID to the request, which will be echo'ed
+    // back in the response by the notecard itself.  This
+    // helps us to identify the asynchronous response
+    // without needing to have an additional state.
+    JAddNumberToObject(req, "id", REQUESTID_DIAGNOTE);
+
+    // Create the body
+    J *body = JAddObjectToObject(req, "body");
+    if (body == NULL) {
+        JDelete(req);
+        return;
+    }
+
     // Fill-in the body
     struct mallinfo mem_info = mallinfo();
 
     JAddNumberToObject(body, "mem.alloc.bytes", (JNUMBER)mem_info.uordblks);
     JAddNumberToObject(body, "mem.free.bytes", (JNUMBER)mem_info.fordblks);
-    JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
+    // JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
     JAddNumberToObject(body, "voltage", (JNUMBER)MX_ADC_A0_Voltage());
 
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
+    APP_PRINTF("diag: note request sent\r\n");
+}
+
+static inline const char * diagStateName (int state)
+{
+    switch (state) {
+    case STATE_DIAG_ABORT:
+        return "DIAG_ABORT";
+    case STATE_DIAG_CHECK:
+        return "DIAG_CHECK";
+    case STATE_DIAG_ISR_XFER:
+        return "DIAG_ISR_XFER";
+    default:
+    {
+        static char undefined_state[20];
+        schedStateName(state, undefined_state, sizeof(undefined_state));
+        return undefined_state;
+    }
+    }
 }
 
 // Register the notefile template for our data
@@ -253,12 +276,12 @@ static bool registerNotefileTemplate()
         return false;
     }
 
-    // Create the body
-    J *body = JAddObjectToObject(req, "body");
-    if (body == NULL) {
-        JDelete(req);
-        return false;
-    }
+    // Fill-in request parameters.  Note that in order to minimize
+    // the size of the over-the-air JSON we're using a special format
+    // for the "file" parameter implemented by the gateway, in which
+    // a "file" parameter beginning with * will have that character
+    // substituted with the textified Sparrow node address.
+    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
 
     // Add an ID to the request, which will be echo'ed
     // back in the response by the notecard itself.  This
@@ -266,12 +289,12 @@ static bool registerNotefileTemplate()
     // without needing to have an additional state.
     JAddNumberToObject(req, "id", REQUESTID_TEMPLATE);
 
-    // Fill-in request parameters.  Note that in order to minimize
-    // the size of the over-the-air JSON we're using a special format
-    // for the "file" parameter implemented by the gateway, in which
-    // a "file" parameter beginning with * will have that character
-    // substituted with the textified Sparrow node address.
-    JAddStringToObject(req, "file", APPLICATION_NOTEFILE);
+    // Create the body
+    J *body = JAddObjectToObject(req, "body");
+    if (body == NULL) {
+        JDelete(req);
+        return false;
+    }
 
     // Fill-in the body template
     JAddNumberToObject(body, "mem.alloc.bytes", TINT32);
