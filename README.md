@@ -20,3 +20,8 @@ Writing Applications
 --------------------
 
 For instructions on how to write applications for the Sparrow framework, please review the following [document: Writing Sparrow Applications](https://bluesinc.atlassian.net/wiki/spaces/SPAR/pages/7733400/Writing+Sparrow+Applications)
+
+Application Guide: Diagnostic
+-----------------------------
+
+A deep dive into the Diagnostic application! Not only does this document provide a high-level overview, but it also moves line-by-line through the source explaining each step. It's a [must read](https://bluesinc.atlassian.net/wiki/spaces/SPAR/pages/7766158/Sparrow+Application+Guide+Diagnostic) if you are planning to develop a Sparrow application.
