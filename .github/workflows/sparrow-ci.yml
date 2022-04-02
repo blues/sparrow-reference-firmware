@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GIT_PAT }}
-          submodules: true
+          submodules: recursive
 
       - name: Build Sparrow Lora Only in Container
         id: sparrow-lora-only
