@@ -8,6 +8,7 @@ add_library(sparrow-application STATIC
     ${CMAKE_CURRENT_LIST_DIR}/bme/bme280/bme280.c
     ${CMAKE_CURRENT_LIST_DIR}/button/button.c
     ${CMAKE_CURRENT_LIST_DIR}/diag/diag.c
+    ${CMAKE_CURRENT_LIST_DIR}/hcsr04q/hcsr04q.c
     ${CMAKE_CURRENT_LIST_DIR}/ping/ping.c
     ${CMAKE_CURRENT_LIST_DIR}/pir/pir.c
 )
@@ -16,6 +17,7 @@ target_include_directories(sparrow-application
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/bme
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/button
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/diag
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/hcsr04q
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ping
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/pir
 )
