@@ -12,8 +12,8 @@
 // Forward Declaration(s)
 typedef struct J J;
 
-bool hcsr04qActivate(int appID, void *appContext);
-bool hcsr04qInit(void);
-void hcsr04qISR(int appID, uint16_t pins, void *appContext);
-void hcsr04qPoll(int appID, int state, void *appContext);
-void hcsr04qResponse(int appID, J *rsp, void *appContext);
+bool hcsr04qActivate (int appID, void *appContext);
+bool hcsr04qInit (void);
+void hcsr04qISR (int appID, uint16_t pins, void *appContext);
+void hcsr04qPoll (int appID, int state, void *appContext);
+void hcsr04qResponse (int appID, J *rsp, void *appContext);

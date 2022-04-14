@@ -8,15 +8,14 @@
  * The SparkFun Qwiic Ultrasonic Distance Sensor is an upgrade to the popular
  * HC-SR04, which provides a microcontroller to enable I2C communication and
  * transform the duration of the ultrasonic ping into millimeters.
- * 
+ *
  * In order to ensure the device is compatible with the Sparrow, you will need
  * ensure the following conditions are met:
  *
  * - Leave the HC-SR04 I2C pullups intact
  * - Place a 100uF capacitor on the Qwiic power lines (accessed via `VIO` and
  *  `GND` on the Sparrow)
- * - Use a MOSFET to switch on and off the Qwiic power
- * 
+ *
  * These additional components will ensure the device functions as expected, and
  * will perform well in the low-power environment provided by the Sparrow.
  ************************/
@@ -32,11 +31,11 @@
 #include <note.h>
 
 #define HCSR04Q_I2C_TIMEOUT_MS 100
-#define HCSR04Q_RANGE_REG 0x01
+#define HCSR04Q_RANGE_REG      0x01
 
 // States for the local state machine
-#define STATE_HCSR04Q_ABORT       0
-#define STATE_HCSR04Q_CHECK       1
+#define STATE_HCSR04Q_ABORT    0
+#define STATE_HCSR04Q_CHECK    1
 
 // Special request IDs
 #define REQUESTID_TEMPLATE     19790917
@@ -53,13 +52,13 @@ typedef struct applicationContext {
 } applicationContext;
 
 // Forwards
-static void addRangeNote(applicationContext * ctx, bool immediate);
+static void addRangeNote (applicationContext * ctx, bool immediate);
 static const char * hcsr04qStateName (int state);
 static inline uint16_t queryHcsr04q (applicationContext * ctx);
-static bool registerNotefileTemplate(void);
+static bool registerNotefileTemplate (void);
 
 // Application Activation (on wake)
-bool hcsr04qActivate(int appID, void *appContext)
+bool hcsr04qActivate (int appID, void *appContext)
 {
     APP_PRINTF("hcsr04q: Entered application callback function: hcsr04qActivate\r\n\tappId: %d\r\n", appID);
 
@@ -74,7 +73,7 @@ bool hcsr04qActivate(int appID, void *appContext)
 }
 
 // Scheduled App One-Time Init
-bool hcsr04qInit(void)
+bool hcsr04qInit (void)
 {
     APP_PRINTF("hcsr04q: Initializing application...\r\n");
 
@@ -114,7 +113,7 @@ bool hcsr04qInit(void)
 }
 
 // Interrupt handler
-void hcsr04qISR(int appID, uint16_t pins, void *appContext)
+void hcsr04qISR (int appID, uint16_t pins, void *appContext)
 {
     // Unused Parameter(s)
     (void)appContext;
@@ -126,7 +125,7 @@ void hcsr04qISR(int appID, uint16_t pins, void *appContext)
 }
 
 // Poller
-void hcsr04qPoll(int appID, int state, void *appContext)
+void hcsr04qPoll (int appID, int state, void *appContext)
 {
     APP_PRINTF("hcsr04q: Entered application callback function: hcsr04qPoll\r\n\tappId: %d\tstate: %s\r\n", appID, hcsr04qStateName(state));
 
@@ -163,9 +162,10 @@ void hcsr04qPoll(int appID, int state, void *appContext)
 }
 
 // Gateway Response handler
-void hcsr04qResponse(int appID, J *rsp, void *appContext)
+void hcsr04qResponse (int appID, J *rsp, void *appContext)
 {
     APP_PRINTF("hcsr04q: Entered application callback function: hcsr04qResponse\r\n\tappId: %d", appID);
+
     char *json_string = JConvertToJSONString(rsp);
     APP_PRINTF("\trsp: %s\r\n", json_string);
     free(json_string);
@@ -188,13 +188,12 @@ void hcsr04qResponse(int appID, J *rsp, void *appContext)
         APP_PRINTF("hcsr04q: SUCCESSFUL template registration\r\n");
         break;
     default:
-        ;
         APP_PRINTF("hcsr04q: received unexpected response\r\n");
     }
 }
 
 // Send the application data
-static void addRangeNote(applicationContext * ctx, bool immediate)
+static void addRangeNote (applicationContext * ctx, bool immediate)
 {
     APP_PRINTF("hcsr04q: generating range Note\r\n");
 
@@ -244,9 +243,10 @@ static inline const char * hcsr04qStateName (int state)
 }
 
 static inline uint16_t queryHcsr04q (applicationContext * ctx) {
-    uint16_t result, temp;
-    
     APP_PRINTF("hcsr04q: querying HC-SR04 via Qwiic connector...\r\n");
+
+    uint16_t result, temp;
+
     MX_I2C2_Init();
     if (!MY_I2C2_ReadRegister(ctx->i2cAddr, HCSR04Q_RANGE_REG, &temp, sizeof(temp), HCSR04Q_I2C_TIMEOUT_MS)) {
         APP_PRINTF("hcsr04q: [ERROR][I2C] Failed to read from register %d!\r\n", HCSR04Q_RANGE_REG);
@@ -267,7 +267,7 @@ static inline uint16_t queryHcsr04q (applicationContext * ctx) {
 }
 
 // Register the notefile template for our data
-static bool registerNotefileTemplate()
+static bool registerNotefileTemplate (void)
 {
     APP_PRINTF("hcsr04q: template registration request\r\n");
 
