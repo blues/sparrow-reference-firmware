@@ -15,6 +15,7 @@
  * - Leave the HC-SR04 I2C pullups intact
  * - Place a 100uF capacitor on the Qwiic power lines (accessed via `VIO` and
  *  `GND` on the Sparrow)
+ * - Use a PNP transistor attached to A3 switch on and off the Qwiic power
  *
  * These additional components will ensure the device functions as expected, and
  * will perform well in the low-power environment provided by the Sparrow.
@@ -30,6 +31,9 @@
 #include <framework.h>
 #include <note.h>
 
+#define HCSR04Q_ENABLE_DELAY_MS 50
+#define HCSR04Q_ENABLE_Pin      A3_Pin
+#define HCSR04Q_ENABLE_Port     A3_GPIO_Port
 #define HCSR04Q_I2C_RETRY_COUNT 3
 #define HCSR04Q_I2C_TIMEOUT_MS  100
 #define HCSR04Q_RANGE_REG       0x01
@@ -57,6 +61,8 @@ static void addRangeNote (applicationContext * ctx, bool immediate);
 static const char * hcsr04qStateName (int state);
 static inline uint16_t queryHcsr04q (applicationContext * ctx);
 static bool registerNotefileTemplate (void);
+static inline void sensorDisable (void);
+static inline void sensorEnable (void);
 
 // Application Activation (on wake)
 bool hcsr04qActivate (int appID, void *appContext)
@@ -82,17 +88,27 @@ bool hcsr04qInit (void)
 
     // Allocate and initialize application context
     applicationContext *ctx = (applicationContext *)malloc(sizeof(applicationContext));
-    ctx->i2cAddr = 0x00;  // 0x00 is the factory I2C address, but it should
+    ctx->i2cAddr = 0x0A;  // 0x00 is the factory I2C address, but it should
                           // be configured before device can be used reliably
     ctx->templateRegistered = false;
     ctx->done = false;
 
+    // Configure the enable pin
+    GPIO_InitTypeDef init = {0};
+    init.Mode = GPIO_MODE_OUTPUT_PP;
+    init.Pull = GPIO_NOPULL;
+    init.Speed = GPIO_SPEED_FREQ_LOW;
+    init.Pin = HCSR04Q_ENABLE_Pin;
+    HAL_GPIO_Init(HCSR04Q_ENABLE_Port, &init);
+
     // Ping the sensor to see if it's there
+    sensorEnable();
     MX_I2C2_Init();
     if (!(result = MY_I2C2_Ping(ctx->i2cAddr, HCSR04Q_I2C_TIMEOUT_MS, HCSR04Q_I2C_RETRY_COUNT))) {
         APP_PRINTF("hcsr04q: [ERROR] Sensor hardware unavailable!\r\n");
     }
     MX_I2C2_DeInit();
+    sensorDisable();
 
     // If hardware is ready, then register the application
     if (result) {
@@ -251,6 +267,7 @@ static inline uint16_t queryHcsr04q (applicationContext * ctx) {
 
     uint16_t result, temp;
 
+    sensorEnable();
     MX_I2C2_Init();
     if (!MY_I2C2_ReadRegister(ctx->i2cAddr, HCSR04Q_RANGE_REG, &temp, sizeof(temp), HCSR04Q_I2C_TIMEOUT_MS)) {
         APP_PRINTF("hcsr04q: [ERROR][I2C] Failed to read from register %d!\r\n", HCSR04Q_RANGE_REG);
@@ -266,6 +283,7 @@ static inline uint16_t queryHcsr04q (applicationContext * ctx) {
         APP_PRINTF("hcsr04q: range value: %u\r\n", result);
     }
     MX_I2C2_DeInit();
+    sensorDisable();
 
     return result;
 }
@@ -307,4 +325,13 @@ static bool registerNotefileTemplate (void)
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
     return true;
+}
+
+static inline void sensorDisable (void) {
+    HAL_GPIO_WritePin(HCSR04Q_ENABLE_Port, HCSR04Q_ENABLE_Pin, GPIO_PIN_SET);
+}
+
+static inline void sensorEnable (void) {
+    HAL_GPIO_WritePin(HCSR04Q_ENABLE_Port, HCSR04Q_ENABLE_Pin, GPIO_PIN_RESET);
+    NoteDelayMs(HCSR04Q_ENABLE_DELAY_MS);
 }
