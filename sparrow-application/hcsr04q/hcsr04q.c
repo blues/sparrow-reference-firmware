@@ -82,7 +82,8 @@ bool hcsr04qInit (void)
 
     // Allocate and initialize application context
     applicationContext *ctx = (applicationContext *)malloc(sizeof(applicationContext));
-    ctx->i2cAddr = 0x0A;  // Address must be configured before device can be used reliably
+    ctx->i2cAddr = 0x00;  // 0x00 is the factory I2C address, but it should
+                          // be configured before device can be used reliably
     ctx->templateRegistered = false;
     ctx->done = false;
 
