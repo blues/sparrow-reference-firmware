@@ -30,19 +30,20 @@
 #include <framework.h>
 #include <note.h>
 
-#define HCSR04Q_I2C_TIMEOUT_MS 100
-#define HCSR04Q_RANGE_REG      0x01
+#define HCSR04Q_I2C_RETRY_COUNT 3
+#define HCSR04Q_I2C_TIMEOUT_MS  100
+#define HCSR04Q_RANGE_REG       0x01
 
 // States for the local state machine
-#define STATE_HCSR04Q_ABORT    0
-#define STATE_HCSR04Q_CHECK    1
+#define STATE_HCSR04Q_ABORT     0
+#define STATE_HCSR04Q_CHECK     1
 
 // Special request IDs
-#define REQUESTID_TEMPLATE     19790917
+#define REQUESTID_TEMPLATE      19790917
 
 // The dynamic filename of the application specific queue.
 // NOTE: The Gateway will replace `*` with the originating node's ID.
-#define APPLICATION_NOTEFILE   "*#hcsr04q.qo"
+#define APPLICATION_NOTEFILE    "*#hcsr04q.qo"
 
 typedef struct applicationContext {
     uint8_t i2cAddr;
@@ -81,13 +82,15 @@ bool hcsr04qInit (void)
 
     // Allocate and initialize application context
     applicationContext *ctx = (applicationContext *)malloc(sizeof(applicationContext));
-    ctx->i2cAddr = 0x0A;
+    ctx->i2cAddr = 0x0A;  // Address must be configured before device can be used reliably
     ctx->templateRegistered = false;
     ctx->done = false;
 
     // Ping the sensor to see if it's there
     MX_I2C2_Init();
-    result = MY_I2C2_Ping(ctx->i2cAddr, HCSR04Q_I2C_TIMEOUT_MS, 3);
+    if (!(result = MY_I2C2_Ping(ctx->i2cAddr, HCSR04Q_I2C_TIMEOUT_MS, HCSR04Q_I2C_RETRY_COUNT))) {
+        APP_PRINTF("hcsr04q: [ERROR] Sensor hardware unavailable!\r\n");
+    }
     MX_I2C2_DeInit();
 
     // If hardware is ready, then register the application
