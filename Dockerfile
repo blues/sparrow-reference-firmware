@@ -29,7 +29,8 @@ ARG UID
 ARG USER
 
 # Define local arguments
-ARG STM32CUBEIDE_CHECKSUM="565075a54e5438e950f351270ab4f5f6"
+ARG STM32CUBEIDE_CHECKSUM="a669613ae578299f9e0ed50d4080eae2"
+ARG STM32CUBEIDE_DOWNLOAD_URL="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/13/d4/6b/b0/d2/fd/47/6d/stm32cubeide_deb/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip"
 
 # Create Non-Root User
 RUN ["dash", "-c", "\
@@ -74,18 +75,18 @@ WORKDIR /root
 
 # Download/Install STM32CubeIDE (packages GNU ARM Compiler, STM32 Programmer CLI, and ST-LINK GDB Server)
 RUN ["dash", "-c", "\
-    curl -SLO# https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/49/6d/3d/62/eb/0d/42/4b/stm32cubeide_deb/files/st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip \
- && md5sum en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip \
- && echo \"${STM32CUBEIDE_CHECKSUM} en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip\" | md5sum -c - \
- && unzip en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip -d STM32CubeIDE-1.8.0 \
- && chmod +x STM32CubeIDE-1.8.0/st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh \
- && yes | LICENSE_ALREADY_ACCEPTED=1 STM32CubeIDE-1.8.0/st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh \
- && rm -rf en.st-stm32cubeide_1.8.0_11526_20211125_0815_amd64.deb_bundle.sh.zip STM32CubeIDE-1.8.0/ \
+    curl -SLO# ${STM32CUBEIDE_DOWNLOAD_URL} \
+ && md5sum en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip \
+ && echo \"${STM32CUBEIDE_CHECKSUM} en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip\" | md5sum -c - \
+ && unzip en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip -d STM32CubeIDE-1.9.0 \
+ && chmod +x STM32CubeIDE-1.9.0/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh \
+ && yes | LICENSE_ALREADY_ACCEPTED=1 STM32CubeIDE-1.9.0/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh \
+ && rm -rf en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip STM32CubeIDE-1.9.0/ \
 "]
-ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.100.202110141430/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.linux64_2.0.0.202105311346/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin:${PATH}
-ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.8.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.100.202109301221/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
+ENV PATH=/opt/st/stm32cubeide_1.9.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.200.202202231230/tools/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.9.0/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.9.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.200.202202231230/tools/bin:${PATH}
+ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.9.0/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.200.202202231230/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
 
 # Set Execution Environment
 WORKDIR /host-volume
