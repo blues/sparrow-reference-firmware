@@ -11,6 +11,13 @@
 #include <framework.h>
 #include <note.h>
 
+// Addresses of the BME sensor used to identify
+// the Sparrow Reference Sensor Board
+#define BME280_I2C_ADDR_PRIM        UINT8_C(0x76)
+#define BME280_I2C_ADDR_SEC         UINT8_C(0x77)
+#define BME280_I2C_RETRY_COUNT      3
+#define BME280_I2C_TIMEOUT_MS       100
+
 // Suppression timer for PIR activity, so that in a high-activity area
 // it isn't continuously sending messages
 #define PIR_SUPPRESSION_MINS        15
@@ -38,12 +45,18 @@ static int appID = -1;
 
 // Forwards
 static void addNote(bool immediate);
+static inline bool isSparrowReferenceSensorBoard(void);
 static bool registerNotefileTemplate(void);
 static void resetInterrupt(void);
 
 // Scheduled App One-Time Init
 bool pirInit()
 {
+
+    // Do not initialize if this isn't a Sparrow Reference Sensor Board
+    if (!isSparrowReferenceSensorBoard()) {
+        return false;
+    }
 
     // Register the app
     schedAppConfig config = {
@@ -215,13 +228,6 @@ void pirPoll(int appID, int state, void *appContext)
     // Unused parameter(s)
     (void)appContext;
 
-    // Disable if this isn't a Sparrow reference board
-    if (appSKU() != SKU_REFERENCE) {
-        HAL_NVIC_DisableIRQ(PIR_DIRECT_LINK_EXTI_IRQn);
-        schedDisable(appID);
-        return;
-    }
-
     // Switch based upon state
     switch (state) {
 
@@ -387,4 +393,25 @@ void pirISR(int appID, uint16_t pins, void *appContext)
         return;
     }
 
+}
+
+// We have no viable way of detecting whether or not the PIR sensor
+// hardware is present, so we use the presence of the BME280 as a proxy.
+bool isSparrowReferenceSensorBoard (void) {
+    bool result;
+
+    // Power on the sensor to see if it's here
+    GPIO_InitTypeDef init = {0};
+    init.Speed = GPIO_SPEED_FREQ_LOW;
+    init.Pin = BME_POWER_Pin;
+    init.Mode = GPIO_MODE_OUTPUT_PP;
+    init.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(BME_POWER_GPIO_Port, &init);
+    HAL_GPIO_WritePin(BME_POWER_GPIO_Port, BME_POWER_Pin, GPIO_PIN_SET);
+    MX_I2C2_Init();
+    result = (MY_I2C2_Ping(BME280_I2C_ADDR_PRIM, BME280_I2C_TIMEOUT_MS, BME280_I2C_RETRY_COUNT)
+           || MY_I2C2_Ping(BME280_I2C_ADDR_SEC, BME280_I2C_TIMEOUT_MS, BME280_I2C_RETRY_COUNT));
+    MX_I2C2_DeInit();
+
+    return result;
 }

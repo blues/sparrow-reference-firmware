@@ -11,15 +11,11 @@
 #include "pir/pir.h"
 
 void schedAppInit (void) {
-    // Will automatically disable if BME280 is not detected
-    if (!bmeInit()) {
-        APP_PRINTF("ERROR: Failed to initialize BME280 application!\r\n");
-    }
+    // Will not initialize if BME280 is not detected
+    bmeInit();
 
-    // Will automatically disable if BME application is not detected
-    if (!pirInit()) {
-        APP_PRINTF("ERROR: Failed to initialize PIR application!\r\n");
-    }
+    // Will not initialize if not a Sparrow Reference Sensor Board
+    pirInit();
 
     // Reports node identifier and signal health information on button click
     if (!buttonInit()) {
