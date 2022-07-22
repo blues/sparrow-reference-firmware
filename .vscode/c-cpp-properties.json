@@ -13,7 +13,8 @@
             "defines": [
                 "CMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-gcc-toolchain.cmake",
                 "CORE_CM4",
-                "CURRENT_BOARD=2",
+                "CURRENT_BOARD=1", // Sparrow v1.0
+                // "CURRENT_BOARD=2", // Sparrow v1.1
                 "STM32WL55xx"
             ],
             "includePath": [
