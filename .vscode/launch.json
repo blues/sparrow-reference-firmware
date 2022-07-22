@@ -11,9 +11,8 @@
             "executable": "${workspaceRoot}/build/sparrow.elf",
             "cwd": "${workspaceRoot}",
             "request": "launch",
-            "device": "STM32WL55CC_M4",
+            "device": "STM32WLE5CC",
             "servertype": "stlink",
-            "stm32cubeprogrammer": "/opt/st/stm32cubeide_1.9.0/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.200.202202231230/tools/bin"
         }
     ]
 }
