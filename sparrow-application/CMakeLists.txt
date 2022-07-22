@@ -12,6 +12,7 @@ add_library(sparrow-application STATIC
     ${CMAKE_CURRENT_LIST_DIR}/hcsr04q/hcsr04q.c
     ${CMAKE_CURRENT_LIST_DIR}/ping/ping.c
     ${CMAKE_CURRENT_LIST_DIR}/pir/pir.c
+    ${CMAKE_CURRENT_LIST_DIR}/THAT-button/THAT-button.c
 )
 
 target_include_directories(sparrow-application
@@ -22,6 +23,7 @@ target_include_directories(sparrow-application
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/hcsr04q
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ping
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/pir
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/THAT-button
 )
 
 add_dependencies(sparrow-application
