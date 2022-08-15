@@ -8,6 +8,7 @@
 // Scheduled App Header(s)
 #include "bme/bme.h"
 #include "button/button.h"
+#include "diag/diag.h"
 #include "pir/pir.h"
 
 void schedAppInit (void) {
@@ -20,5 +21,10 @@ void schedAppInit (void) {
     // Reports node identifier and signal health information on button click
     if (!buttonInit()) {
         APP_PRINTF("ERROR: Failed to initialize button application!\r\n");
+    }
+
+    // Reports node diagnostic information on button click and interval
+    if (!diagInit()) {
+        APP_PRINTF("ERROR: Failed to initialize diagnostic application!\r\n");
     }
 }

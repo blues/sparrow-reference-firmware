@@ -41,7 +41,7 @@ add_compile_options(
     -fdata-sections
     -Wall
     -Wextra
-    -Wpedantic
+    # -Wpedantic
     -Wimplicit-fallthrough=2
     -Wno-unused-parameter
     -fstack-usage
