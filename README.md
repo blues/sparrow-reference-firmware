@@ -4,17 +4,17 @@ Sparrow Accelerator Sensor Firmware
 Quickstart Guide
 ----------------
 
-For absolute minimal instructions for setting up your hardware, please review the following [document: Sparrow Quickstart Guide](https://bluesinc.atlassian.net/wiki/spaces/SPAR/pages/7733505/Sparrow+Quickstart+Guide)
+For absolute minimal instructions for setting up your hardware, please review the following [documentation: Sparrow Quickstart](https://dev.blues.io/quickstart/sparrow-quickstart/)
 
-Binary Installation Guide
--------------------------
+Firmware Updates
+----------------
 
-For instructions on how to download a GitHub release and upload the binary to your device, please review the following [document: Sparrow Binary Installation Guide](https://bluesinc.atlassian.net/wiki/spaces/SPAR/pages/7733492/Sparrow+Binary+Installation+Guide)
+For instructions on how to download a GitHub release and upload the binary to your device, please review the following [documentation: Sparrow Firmware Updates](https://dev.blues.io/sparrow/sparrow-firmware-updates/)
 
-Setup and Run Guide
--------------------
+Builder's Guide
+---------------
 
-For instructions on how to setup your hardware, please review the following [document: Sparrow Setup and Run Guide](https://bluesinc.atlassian.net/wiki/spaces/SPAR/pages/7864441/Sparrow+Setup+and+Run+Guide)
+For instructions on how to setup your hardware, please review the following [documentation: Sparrow Builder's Guide](https://dev.blues.io/sparrow/sparrow-builders-guide/)
 
 Writing Applications
 --------------------
