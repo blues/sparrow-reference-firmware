@@ -121,7 +121,6 @@ void contactSwitchPoll(int appID, int state, void *appContext)
             APP_PRINTF("Contact Switch: template registration request\r\n");
             break;
         }
-        atpMaximizePowerLevel();
         addNote(appID);
         schedSetCompletionState(appID, STATE_SENDING_REQUEST, STATE_DEACTIVATED);
         APP_PRINTF("Contact Switch: sent switch update\r\n");
@@ -129,7 +128,6 @@ void contactSwitchPoll(int appID, int state, void *appContext)
 
     case STATE_RECEIVING_RESPONSE:
     case STATE_SENDING_REQUEST:
-        ledIndicateAck(1);
         break;
 
     default:
@@ -209,7 +207,7 @@ static bool addNote(int appID)
     JAddStringToObject(body, "contactSwitch", SwitchStatus);
 
     // Format the log message
-    char message[80];
+    char message[80] = {0};
     if (schedAppName(appID)[0] != '\0') {
         strlcat(message, schedAppName(appID), sizeof(message));
     }
