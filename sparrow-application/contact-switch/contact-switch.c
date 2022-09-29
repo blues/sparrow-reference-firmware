@@ -5,7 +5,7 @@
 #include "contact-switch.h"
 
 /************************
- * The Adafruit Magnetic Contact Switch sensor. 
+ * The Adafruit Magnetic Contact Switch sensor.
  * For more information visit: https://www.adafruit.com/product/375
  ************************/
 
@@ -102,7 +102,7 @@ void contactSwitchPoll(int appID, int state, void *appContext)
         schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
         APP_PRINTF("Contact Switch: template registration request\r\n");
         break;
-        
+
     // Immediately deactivate - nothing to do
     case STATE_ACTIVATED:
         schedSetState(appID, STATE_DEACTIVATED, "Contact Switch: nothing to do");
@@ -148,7 +148,7 @@ void contactSwitchResponse(int appID, J *rsp, void *appContext)
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
         ledIndicateAck(4);
-        APP_PRINTF("Contact Switch: app error response: %s\r\n", err);
+        APP_PRINTF("Contact Switch: gateway returned error: %s\r\n", err);
         schedSetState(appID, STATE_DEACTIVATED, NULL);
         return;
     }
@@ -213,7 +213,7 @@ static bool addNote(int appID)
     }
     strlcat(message, " is ", sizeof(message));
     strlcat(message, SwitchStatus, sizeof(message));
-    
+
     APP_PRINTF("%s\r\n", message);
 
     // Attach the body to the request, and send it to the gateway

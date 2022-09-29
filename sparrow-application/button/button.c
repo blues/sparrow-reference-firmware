@@ -117,7 +117,7 @@ bool sendHealthLogMessage(bool immediate)
     }
 
     // Format the health message
-    char message[80];
+    char message[80] = {0};
     utilAddressToText(ourAddress, message, sizeof(message));
     if (schedAppName(appID)[0] != '\0') {
         strlcat(message, " (", sizeof(message));
@@ -165,7 +165,7 @@ void buttonResponse(int appID, J *rsp, void *appContext)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("button: app error response: %d\r\n", err);
+        APP_PRINTF("button: gateway returned error: %s\r\n", err);
         return;
     }
 

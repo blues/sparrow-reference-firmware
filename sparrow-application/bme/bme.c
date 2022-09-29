@@ -189,7 +189,7 @@ void bmeResponse(int appID, J *rsp, void *appContext)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("bme: app error response: %d\r\n", err);
+        APP_PRINTF("bme: gateway returned error: %s\r\n", err);
         return;
     }
 

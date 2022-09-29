@@ -67,6 +67,7 @@ RUN ["dash", "-c", "\
      libwebkit2gtk-4.0-37 \
      make \
      nano \
+     ssh \
      udev \
      unzip \
  && apt-get clean \

@@ -181,7 +181,7 @@ void diagResponse(int appID, J *rsp, void *appContext)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("diag: app error response: %d\r\n", err);
+        APP_PRINTF("diag: gateway returned error: %s\r\n", err);
         schedSetState(appID, STATE_DIAG_ABORT, "diag: aborting...");
         return;
     }
