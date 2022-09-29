@@ -180,7 +180,7 @@ void hcsr04qResponse (int appID, J *rsp, void *appContext)
     // See if there's an error
     char *err = JGetString(rsp, "err");
     if (err[0] != '\0') {
-        APP_PRINTF("hcsr04q: app error response: %d\r\n", err);
+        APP_PRINTF("hcsr04q: gateway returned error: %s\r\n", err);
         schedSetState(appID, STATE_HCSR04Q_ABORT, "hcsr04q: aborting...");
         return;
     }
