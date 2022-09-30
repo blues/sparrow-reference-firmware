@@ -13,6 +13,9 @@
 #include <framework.h>
 #include <note.h>
 
+// Comment out the following line for debug program flow
+#define NDEBUG
+
 // Define application GPIO confirguration
 #define CONTACT_SWITCH_Pin             A1_Pin
 #define CONTACT_SWITCH_Port            A1_GPIO_Port
@@ -46,7 +49,7 @@ bool contactSwitchInit()
     schedAppConfig config = {
         .name = "Contact Switch",
         .activationPeriodSecs = 60 * 24,
-        .pollPeriodSecs = 1,
+        .pollPeriodSecs = 15,
         .activateFn = NULL,
         .interruptFn = contactSwitchISR,
         .pollFn = contactSwitchPoll,
@@ -99,8 +102,8 @@ void contactSwitchPoll(int appID, int state, void *appContext)
 
     case STATE_ONCE:
         registerNotefileTemplate();
-        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
-        APP_PRINTF("Contact Switch: template registration request\r\n");
+        schedSetCompletionState(appID, STATE_SENDING_REQUEST, STATE_DEACTIVATED);
+        APP_PRINTF("Contact Switch: initial template registration request\r\n");
         break;
 
     // Immediately deactivate - nothing to do
@@ -118,11 +121,15 @@ void contactSwitchPoll(int appID, int state, void *appContext)
         if (!templateRegistered) {
             registerNotefileTemplate();
             schedSetCompletionState(appID, STATE_SWITCH_CHANGE, STATE_DEACTIVATED);
-            APP_PRINTF("Contact Switch: template registration request\r\n");
+            APP_PRINTF("Contact Switch: retry template registration request\r\n");
             break;
         }
         addNote(appID);
+#ifdef NDEBUG
+        schedSetCompletionState(appID, STATE_DEACTIVATED, STATE_DEACTIVATED);
+#else
         schedSetCompletionState(appID, STATE_SENDING_REQUEST, STATE_DEACTIVATED);
+#endif
         APP_PRINTF("Contact Switch: sent switch update\r\n");
         // fallthrough to awaiting response
 
@@ -221,7 +228,11 @@ static bool addNote(int appID)
 
     // send to gateway
     sensorIgnoreTimeWindow();
-    noteSendToGatewayAsync(req, false); // set to true for debugging purposes
+#ifdef NDEBUG
+    noteSendToGatewayAsync(req, false);
+#else
+    noteSendToGatewayAsync(req, true);
+#endif
     return true;
 
 }
