@@ -36,7 +36,7 @@ add_compile_options(
     -std=gnu11
     -g3
     -c
-    -O0
+    -Og
     -ffunction-sections
     -fdata-sections
     -Wall
