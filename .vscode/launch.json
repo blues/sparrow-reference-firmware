@@ -12,7 +12,7 @@
             "cwd": "${workspaceRoot}",
             "request": "launch",
             "device": "STM32WLE5CC",
-            "servertype": "stlink",
+            "servertype": "stlink"
         }
     ]
 }

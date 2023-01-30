@@ -240,7 +240,9 @@ static void addDiagnosticNote(bool immediate)
     JAddNumberToObject(body, "mem.alloc.bytes", (JNUMBER)mem_info.uordblks);
     JAddNumberToObject(body, "mem.free.bytes", (JNUMBER)mem_info.fordblks);
     JAddNumberToObject(body, "mem.heap.bytes", (JNUMBER)MX_Heap_Size(NULL));
+#ifdef USE_SPARROW
     JAddNumberToObject(body, "voltage", (JNUMBER)MX_ADC_A0_Voltage());
+#endif
 
     // Send request to the gateway
     noteSendToGatewayAsync(req, true);
