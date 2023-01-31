@@ -29,10 +29,10 @@ ARG UID
 ARG USER
 
 # Local Argument(s)
-ARG STM32CUBEIDE_CHECKSUM="509be8e9a21e89c8da4a5d44437cb15d"
-ARG STM32CUBEIDE_DIRECTORY="en.st-stm32cubeide_1.10.1_12716_20220707_0928_amd64.deb_bundle.sh"
-ARG STM32CUBEIDE_DOWNLOAD_URL="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/1d/69/cb/af/24/d9/44/78/stm32cubeide_deb/files/st-stm32cubeide_1.10.1_12716_20220707_0928_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.10.1_12716_20220707_0928_amd64.deb_bundle.sh.zip"
-ARG STM32CUBEIDE_INSTALL_SCRIPT="st-stm32cubeide_1.10.1_12716_20220707_0928_amd64.deb_bundle.sh"
+ARG STM32CUBEIDE_CHECKSUM="4b3a86b7b3946beb131419c6c8f3cc82"
+ARG STM32CUBEIDE_DIRECTORY="en.st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh"
+ARG STM32CUBEIDE_DOWNLOAD_URL="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/20/f5/df/2a/24/3a/40/49/stm32cubeide_deb/files/st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh.zip"
+ARG STM32CUBEIDE_INSTALL_SCRIPT="st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh"
 
 # Create Non-Root User
 RUN ["dash", "-c", "\
@@ -86,10 +86,10 @@ RUN ["dash", "-c", "\
  && yes | LICENSE_ALREADY_ACCEPTED=1 ${STM32CUBEIDE_DIRECTORY}/${STM32CUBEIDE_INSTALL_SCRIPT} \
  && rm -rf ${STM32CUBEIDE_DIRECTORY}.zip ${STM32CUBEIDE_DIRECTORY}/ \
 "]
-ENV PATH=/opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.301.202207041506/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.300.202203231527/tools/bin:${PATH}
-ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.300.202203231527/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
+ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.500.202209151145/tools/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.100.202210260954/tools/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.400.202209281104/tools/bin:${PATH}
+ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.400.202209281104/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
 
 # Set Execution Environment
 WORKDIR /host-volume
