@@ -78,7 +78,7 @@ WORKDIR /root
 
 # Download/Install STM32CubeIDE (packages GNU ARM Compiler, STM32 Programmer CLI, and ST-LINK GDB Server)
 RUN ["dash", "-c", "\
-    curl -SLO# ${STM32CUBEIDE_DOWNLOAD_URL} \
+    curl --compressed --header 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36' --location --progress-bar --remote-name --show-error ${STM32CUBEIDE_DOWNLOAD_URL} \
  && md5sum ${STM32CUBEIDE_DIRECTORY}.zip \
  && echo \"${STM32CUBEIDE_CHECKSUM} ${STM32CUBEIDE_DIRECTORY}.zip\" | md5sum -c - \
  && unzip ${STM32CUBEIDE_DIRECTORY}.zip -d ${STM32CUBEIDE_DIRECTORY} \
