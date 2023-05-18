@@ -29,10 +29,10 @@ ARG UID
 ARG USER
 
 # Local Argument(s)
-ARG STM32CUBEIDE_CHECKSUM="4b3a86b7b3946beb131419c6c8f3cc82"
-ARG STM32CUBEIDE_DIRECTORY="en.st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh"
-ARG STM32CUBEIDE_DOWNLOAD_URL="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/20/f5/df/2a/24/3a/40/49/stm32cubeide_deb/files/st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh.zip"
-ARG STM32CUBEIDE_INSTALL_SCRIPT="st-stm32cubeide_1.11.2_14494_20230119_0724.unsigned_amd64.deb_bundle.sh"
+ARG STM32CUBECLT_CHECKSUM="e6c3c5a0fb2583e43b4b58dfdbd49ecd"
+ARG STM32CUBECLT_DIRECTORY="en.st-stm32cubeclt_1.12.1_16088_20230420_1057_amd64.deb_bundle.sh"
+ARG STM32CUBECLT_DOWNLOAD_URL="https://www.st.com/content/ccc/resource/technical/software/application_sw/group0/ae/01/45/d5/38/03/4c/be/STM32CubeCLT-DEB/files/st-stm32cubeclt_1.12.1_16088_20230420_1057_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeclt_1.12.1_16088_20230420_1057_amd64.deb_bundle.sh.zip"
+ARG STM32CUBECLT_INSTALL_SCRIPT="st-stm32cubeclt_1.12.1_16088_20230420_1057_amd64.deb_bundle.sh"
 
 # Create Non-Root User
 RUN ["dash", "-c", "\
@@ -76,20 +76,20 @@ RUN ["dash", "-c", "\
 "]
 WORKDIR /root
 
-# Download/Install STM32CubeIDE (packages GNU ARM Compiler, STM32 Programmer CLI, and ST-LINK GDB Server)
+# Download/Install STM32CUBECLT (packages GNU ARM Compiler, STM32 Programmer CLI, and ST-LINK GDB Server)
 RUN ["dash", "-c", "\
-    curl --compressed --header 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36' --location --progress-bar --remote-name --show-error ${STM32CUBEIDE_DOWNLOAD_URL} \
- && md5sum ${STM32CUBEIDE_DIRECTORY}.zip \
- && echo \"${STM32CUBEIDE_CHECKSUM} ${STM32CUBEIDE_DIRECTORY}.zip\" | md5sum -c - \
- && unzip ${STM32CUBEIDE_DIRECTORY}.zip -d ${STM32CUBEIDE_DIRECTORY} \
- && chmod +x ${STM32CUBEIDE_DIRECTORY}/${STM32CUBEIDE_INSTALL_SCRIPT} \
- && yes | LICENSE_ALREADY_ACCEPTED=1 ${STM32CUBEIDE_DIRECTORY}/${STM32CUBEIDE_INSTALL_SCRIPT} \
- && rm -rf ${STM32CUBEIDE_DIRECTORY}.zip ${STM32CUBEIDE_DIRECTORY}/ \
+    curl --compressed --header 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36' --location --progress-bar --remote-name --show-error ${STM32CUBECLT_DOWNLOAD_URL} \
+ && md5sum ${STM32CUBECLT_DIRECTORY}.zip \
+ && echo \"${STM32CUBECLT_CHECKSUM} ${STM32CUBECLT_DIRECTORY}.zip\" | md5sum -c - \
+ && unzip ${STM32CUBECLT_DIRECTORY}.zip -d ${STM32CUBECLT_DIRECTORY} \
+ && chmod +x ${STM32CUBECLT_DIRECTORY}/${STM32CUBECLT_INSTALL_SCRIPT} \
+ && yes | LICENSE_ALREADY_ACCEPTED=1 ${STM32CUBECLT_DIRECTORY}/${STM32CUBECLT_INSTALL_SCRIPT} \
+ && rm -rf ${STM32CUBECLT_DIRECTORY}.zip ${STM32CUBECLT_DIRECTORY}/ \
 "]
-ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.linux64_2.0.500.202209151145/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.100.202210260954/tools/bin:${PATH}
-ENV PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.400.202209281104/tools/bin:${PATH}
-ENV LD_LIBRARY_PATH=/opt/st/stm32cubeide_1.11.2/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.linux64_2.0.400.202209281104/tools/bin/native/linux_x64:${LD_LIBRARY_PATH}
+ENV PATH=/opt/st/stm32cubeclt_1.12.1/STM32CubeProgrammer/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeclt_1.12.1/GNU-tools-for-STM32/bin:${PATH}
+ENV PATH=/opt/st/stm32cubeclt_1.12.1/STLink-gdb-server/bin:${PATH}
+ENV LD_LIBRARY_PATH=/opt/st/stm32cubeclt_1.12.1/STLink-gdb-server/bin/native/linux_x64:${LD_LIBRARY_PATH}
 
 # Set Execution Environment
 WORKDIR /host-volume
