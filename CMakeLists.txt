@@ -52,27 +52,8 @@ add_compile_options(
     -mthumb
 )
 
-# Compile `note-c` seperately
-add_library(note-c STATIC
-    ${NOTE_C}/n_atof.c
-    ${NOTE_C}/n_b64.c
-    ${NOTE_C}/n_cjson.c
-    ${NOTE_C}/n_cjson_helpers.c
-    ${NOTE_C}/n_const.c
-    ${NOTE_C}/n_ftoa.c
-    ${NOTE_C}/n_helpers.c
-    ${NOTE_C}/n_hooks.c
-    ${NOTE_C}/n_i2c.c
-    ${NOTE_C}/n_md5.c
-    ${NOTE_C}/n_request.c
-    ${NOTE_C}/n_serial.c
-    ${NOTE_C}/n_str.c
-    ${NOTE_C}/n_ua.c
-)
-
-target_include_directories(note-c
-    PUBLIC ${NOTE_C}
-)
+# This will make the note_c library target available.
+add_subdirectory(${NOTE_C})
 
 # Compile ST platform seperately
 add_library(st OBJECT
@@ -178,12 +159,12 @@ target_include_directories(sparrow-runtime
 )
 
 add_dependencies(sparrow-runtime
-    note-c
+    note_c
     st
 )
 
 target_link_libraries(sparrow-runtime
-    PUBLIC note-c
+    PUBLIC note_c
     PUBLIC st
 )
 
